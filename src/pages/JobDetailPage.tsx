@@ -6,6 +6,8 @@ import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { useAuth } from '../contexts/AuthContext';
+import { getMyCandidateProfile } from '../services/candidateService';
+import { isJobSaved, saveJob, unsaveJob } from '../services/savedJobService';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function JobDetailPage() {
@@ -92,6 +94,29 @@ export default function JobDetailPage() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <WhatsAppButton message={whatsappMsg} label="Ask CareerJob" />
+        {user && (
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={async () => {
+              try {
+                const profile = await getMyCandidateProfile(user.id);
+                if (!profile) {
+                  navigate('/candidate/profile');
+                  return;
+                }
+                const saved = await isJobSaved(profile.id, job.id);
+                if (saved) await unsaveJob(profile.id, job.id);
+                else await saveJob(profile.id, job.id);
+                alert(saved ? 'Removed from saved' : 'Job saved');
+              } catch (e: any) {
+                alert(e.message || 'Could not save');
+              }
+            }}
+          >
+            Save Job
+          </Button>
+        )}
       </div>
 
       {/* Sticky mobile Apply */}
