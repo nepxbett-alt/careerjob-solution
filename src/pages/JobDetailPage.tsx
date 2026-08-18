@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, ArrowLeft } from 'lucide-react';
-import { getJobById, Job } from '../services/jobService';
+import { getJobById } from '../services/jobService';
+import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { useAuth } from '../contexts/AuthContext';

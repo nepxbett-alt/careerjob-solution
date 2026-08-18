@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, MapPin, Clock, Briefcase } from 'lucide-react';
-import { searchJobs, getCategories, Job } from '../services/jobService';
+import { searchJobs } from '../services/jobService';
+import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
-import { LOCATIONS, JOB_TYPES } from '../lib/config';
+import { LOCATIONS } from '../lib/config';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function JobsPage() {
@@ -12,15 +13,10 @@ export default function JobsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
 
   const q = searchParams.get('q') || '';
   const location = searchParams.get('location') || 'Pokhara';
   const page = parseInt(searchParams.get('page') || '1', 10);
-
-  useEffect(() => {
-    getCategories().then(setCategories).catch(() => {});
-  }, []);
 
   useEffect(() => {
     setLoading(true);
