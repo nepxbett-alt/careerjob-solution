@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { useAuth } from '../contexts/AuthContext';
 import { BRAND } from '../lib/config';
 import { supabase } from '../lib/supabase';
 
@@ -13,7 +12,6 @@ export default function RegisterPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { signInWithMagicLink } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
