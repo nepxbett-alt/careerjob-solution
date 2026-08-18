@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAllApplications, updateApplicationStatus, type Application } from '../../services/applicationService';
 import { Button } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 const NEXT: Record<string, string[]> = {
   applied: ['under_review', 'shortlisted', 'rejected'],
@@ -74,9 +75,7 @@ export default function ApplicationsPage() {
                   {app.candidate_profiles?.phone} · Applied {new Date(app.applied_at).toLocaleDateString()}
                 </div>
               </div>
-              <span className="text-xs font-medium h-fit px-2 py-1 rounded bg-slate-100 capitalize">
-                {app.status.replace('_', ' ')}
-              </span>
+              <StatusBadge status={app.status} />
             </div>
             {(NEXT[app.status] || []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">

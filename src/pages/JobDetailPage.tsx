@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { MapPin, Clock, Briefcase, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, Briefcase, ArrowLeft, Bookmark, BookmarkCheck } from 'lucide-react';
 import { getJobById } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
@@ -9,12 +9,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { getMyCandidateProfile } from '../services/candidateService';
 import { isJobSaved, saveJob, unsaveJob } from '../services/savedJobService';
 import { formatDistanceToNow } from 'date-fns';
+import { Skeleton } from '../components/ui/Skeleton';
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [saveBusy, setSaveBusy] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -22,128 +25,159 @@ export default function JobDetailPage() {
     if (!id) return;
     setLoading(true);
     getJobById(id)
-      .then(setJob)
-      .catch(() => setError('Job not found or no longer available.'))
+      .then(async (j) => {
+        setJob(j);
+        if (user) {
+          try {
+            const profile = await getMyCandidateProfile(user.id);
+            if (profile) setSaved(await isJobSaved(profile.id, j.id));
+          } catch { /* ignore */ }
+        }
+      })
+      .catch(() => setError('This job is not available or has been closed.'))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, user]);
 
-  if (loading) return <div className="text-center py-20 text-gray-500">Loading…</div>;
+  const handleApply = () => {
+    if (!user) navigate('/login?redirect=/jobs/' + id);
+    else navigate('/candidate/applications?apply=' + id);
+  };
+
+  const handleSave = async () => {
+    if (!user || !job) {
+      navigate('/login?redirect=/jobs/' + id);
+      return;
+    }
+    setSaveBusy(true);
+    try {
+      const profile = await getMyCandidateProfile(user.id);
+      if (!profile) {
+        navigate('/candidate/profile');
+        return;
+      }
+      if (saved) {
+        await unsaveJob(profile.id, job.id);
+        setSaved(false);
+      } else {
+        await saveJob(profile.id, job.id);
+        setSaved(true);
+      }
+    } catch (e: any) {
+      alert(e.message || 'Could not update saved jobs');
+    } finally {
+      setSaveBusy(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="cj-container max-w-3xl py-10 space-y-4" aria-busy="true">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
+  }
+
   if (error || !job) {
     return (
-      <div className="text-center py-20">
-        <p className="text-gray-600 mb-4">{error || 'Job not found'}</p>
-        <Link to="/jobs"><Button>Back to Jobs</Button></Link>
+      <div className="cj-container max-w-3xl py-16 text-center">
+        <p className="text-slate-600 mb-4">{error || 'Job not found'}</p>
+        <Link to="/jobs"><Button>Back to jobs</Button></Link>
       </div>
     );
   }
 
   const whatsappMsg = `Hello CareerJob, I am interested in the ${job.title} position in ${job.location}.`;
+  const locationLabel = job.location_detail ? `${job.location_detail}, ${job.location}` : job.location;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 pb-28">
-      <Link to="/jobs" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-[#0066FF] mb-6">
-        <ArrowLeft className="w-4 h-4" /> Back to jobs
+    <div className="cj-container max-w-3xl py-8 pb-28 md:pb-12">
+      <Link to="/jobs" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0066FF] mb-6 min-h-[44px]">
+        <ArrowLeft className="w-4 h-4" aria-hidden /> Back to jobs
       </Link>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{job.title}</h1>
-
-      <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-600 mb-6">
-        <span className="inline-flex items-center gap-1"><MapPin className="w-4 h-4" />{job.location_detail ? `${job.location_detail}, ${job.location}` : job.location}</span>
-        {job.job_categories?.name && <span className="inline-flex items-center gap-1"><Briefcase className="w-4 h-4" />{job.job_categories.name}</span>}
-        {job.published_at && <span className="inline-flex items-center gap-1"><Clock className="w-4 h-4" />{formatDistanceToNow(new Date(job.published_at), { addSuffix: true })}</span>}
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-8">
-        {job.salary_display && <span className="font-medium bg-gray-100 px-3 py-1 rounded-lg">{job.salary_display}</span>}
-        <span className="bg-gray-50 px-3 py-1 rounded-lg capitalize">{job.job_type.replace('-', ' ')}</span>
-        {job.experience_required && <span className="bg-gray-50 px-3 py-1 rounded-lg">{job.experience_required}</span>}
-      </div>
-
-      {job.public_employer_label && (
-        <p className="text-sm text-gray-500 mb-6 italic">Employer: {job.public_employer_label}</p>
-      )}
+      <header className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-3">{job.title}</h1>
+        {job.public_employer_label && (
+          <p className="text-slate-500 mb-3">{job.public_employer_label}</p>
+        )}
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-600">
+          <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4 text-slate-400" aria-hidden />{locationLabel}</span>
+          {job.job_categories?.name && (
+            <span className="inline-flex items-center gap-1.5"><Briefcase className="w-4 h-4 text-slate-400" aria-hidden />{job.job_categories.name}</span>
+          )}
+          {job.published_at && (
+            <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400" aria-hidden />{formatDistanceToNow(new Date(job.published_at), { addSuffix: true })}</span>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4">
+          {job.salary_display && (
+            <span className="font-medium bg-slate-100 text-slate-800 px-3 py-1 rounded-lg text-sm">{job.salary_display}</span>
+          )}
+          <span className="bg-slate-50 text-slate-700 px-3 py-1 rounded-lg text-sm capitalize">{job.job_type.replace('-', ' ')}</span>
+          {job.experience_required && (
+            <span className="bg-slate-50 text-slate-700 px-3 py-1 rounded-lg text-sm">{job.experience_required}</span>
+          )}
+        </div>
+      </header>
 
       {job.description && (
         <section className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Description</h2>
-          <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">{job.description}</div>
+          <h2 className="font-semibold text-lg text-slate-900 mb-2">About this role</h2>
+          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.description}</div>
         </section>
       )}
       {job.responsibilities && (
         <section className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Responsibilities</h2>
-          <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">{job.responsibilities}</div>
+          <h2 className="font-semibold text-lg text-slate-900 mb-2">Responsibilities</h2>
+          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.responsibilities}</div>
         </section>
       )}
       {job.requirements && (
         <section className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Requirements</h2>
-          <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">{job.requirements}</div>
+          <h2 className="font-semibold text-lg text-slate-900 mb-2">Requirements</h2>
+          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.requirements}</div>
         </section>
       )}
       {job.benefits && (
         <section className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Benefits</h2>
-          <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">{job.benefits}</div>
+          <h2 className="font-semibold text-lg text-slate-900 mb-2">Benefits</h2>
+          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.benefits}</div>
         </section>
       )}
 
-      <p className="text-xs text-gray-400 mb-8">
+      <p className="text-xs text-slate-400 mb-8 leading-relaxed">
         Employer details and exact interview information may be provided by CareerJob during the recruitment process.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Desktop actions */}
+      <div className="hidden md:flex flex-wrap gap-3 items-center">
+        <Button size="lg" onClick={handleApply}>Apply for this job</Button>
+        <Button size="lg" variant="outline" onClick={handleSave} loading={saveBusy} aria-pressed={saved}>
+          {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
+          {saved ? 'Saved' : 'Save job'}
+        </Button>
         <WhatsAppButton message={whatsappMsg} label="Ask CareerJob" />
-        {user && (
+      </div>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom md:hidden z-30">
+        <div className="flex gap-2 max-w-lg mx-auto">
           <Button
             variant="outline"
-            size="lg"
-            onClick={async () => {
-              try {
-                const profile = await getMyCandidateProfile(user.id);
-                if (!profile) {
-                  navigate('/candidate/profile');
-                  return;
-                }
-                const saved = await isJobSaved(profile.id, job.id);
-                if (saved) await unsaveJob(profile.id, job.id);
-                else await saveJob(profile.id, job.id);
-                alert(saved ? 'Removed from saved' : 'Job saved');
-              } catch (e: any) {
-                alert(e.message || 'Could not save');
-              }
-            }}
+            className="shrink-0 min-w-[48px] px-3"
+            onClick={handleSave}
+            loading={saveBusy}
+            aria-label={saved ? 'Unsave job' : 'Save job'}
           >
-            Save Job
+            {saved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
           </Button>
-        )}
-      </div>
-
-      {/* Sticky mobile Apply */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 safe-bottom md:hidden z-30">
-        <Button
-          fullWidth
-          size="lg"
-          onClick={() => {
-            if (!user) navigate('/login?redirect=/jobs/' + id);
-            else navigate('/candidate/applications?apply=' + id);
-          }}
-        >
-          Apply Now
-        </Button>
-      </div>
-
-      {/* Desktop Apply */}
-      <div className="hidden md:block mt-8">
-        <Button
-          size="lg"
-          onClick={() => {
-            if (!user) navigate('/login?redirect=/jobs/' + id);
-            else navigate('/candidate/applications?apply=' + id);
-          }}
-        >
-          Apply Now
-        </Button>
+          <Button fullWidth size="lg" onClick={handleApply}>
+            Apply for this job
+          </Button>
+        </div>
       </div>
     </div>
   );

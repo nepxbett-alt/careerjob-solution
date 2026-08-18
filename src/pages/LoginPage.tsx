@@ -29,55 +29,67 @@ export default function LoginPage() {
     const { error } = await signInWithMagicLink(email.trim());
     setLoading(false);
     if (error) {
-      setError(error.message || 'Unable to send magic link. Please try again.');
+      setError(error.message || "We couldn't send the link. Please try again.");
     } else {
       setSent(true);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-xl font-bold mx-auto mb-3">C</div>
-          <h1 className="text-xl font-bold">{BRAND.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">Sign in with email magic link</p>
+          <div className="w-12 h-12 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-xl font-bold mx-auto mb-3 shadow-sm">
+            C
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Log in</h1>
+          <p className="text-sm text-slate-500 mt-1">{BRAND.name} · email magic link</p>
         </div>
 
         {sent ? (
-          <div className="text-center">
-            <p className="text-gray-700 mb-2">Check your email</p>
-            <p className="text-sm text-gray-500 mb-6">
-              We sent a sign-in link to <strong>{email}</strong>. Click the link to continue.
+          <div className="text-center" role="status">
+            <p className="font-medium text-slate-900 mb-1">Check your email</p>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              We sent a sign-in link to <strong className="text-slate-800">{email}</strong>.
+              Open it on this device to continue.
             </p>
-            <Button variant="outline" onClick={() => setSent(false)}>Use a different email</Button>
+            <Button variant="outline" fullWidth onClick={() => setSent(false)}>
+              Use a different email
+            </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+              <label htmlFor="login-email" className="cj-label">Email address</label>
               <input
-                id="email"
+                id="login-email"
                 type="email"
                 required
+                autoComplete="email"
+                inputMode="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full h-11 px-3 rounded-lg border border-gray-300 focus:border-[#0066FF] outline-none"
+                className="cj-input"
+                aria-invalid={!!error}
+                aria-describedby={error ? 'login-error' : undefined}
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" fullWidth size="lg" disabled={loading}>
-              {loading ? 'Sending…' : 'Send magic link'}
+            {error && (
+              <p id="login-error" className="text-sm text-red-600" role="alert">{error}</p>
+            )}
+            <Button type="submit" fullWidth size="lg" loading={loading}>
+              {loading ? 'Sending link…' : 'Send magic link'}
             </Button>
           </form>
         )}
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          New here? <Link to="/register" className="text-[#0066FF] hover:underline">Create account</Link>
+        <p className="text-center text-sm text-slate-500 mt-6">
+          New here?{' '}
+          <Link to="/register" className="text-[#0066FF] font-medium hover:underline">Create account</Link>
         </p>
-        <p className="text-center text-sm mt-2">
-          <Link to="/" className="text-gray-400 hover:text-gray-600">← Back to home</Link>
+        <p className="text-center text-sm mt-3">
+          <Link to="/" className="text-slate-400 hover:text-slate-600">← Back to home</Link>
         </p>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { BRAND } from '../lib/config';
 import { supabase } from '../lib/supabase';
+import { cn } from '../lib/cn';
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'candidate' | 'business'>('candidate');
@@ -15,12 +16,13 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName.trim() || !phone.trim()) {
+      setError('Please enter your name and phone number.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      // store intended role in user metadata via signUp options isn't available on OTP;
-      // we pass via redirect and also try to update after first login.
-      // For magic link we use signInWithOtp with data.
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
@@ -29,76 +31,120 @@ export default function RegisterPage() {
             role,
             phone: phone.trim(),
           },
-          emailRedirectTo: window.location.origin + (role === 'business' ? '/business' : '/candidate/profile'),
+          emailRedirectTo:
+            window.location.origin + (role === 'business' ? '/business' : '/candidate/profile'),
         },
       });
       if (otpError) throw otpError;
       setSent(true);
     } catch (err: any) {
-      setError(err.message || 'Could not send link');
+      setError(err.message || "We couldn't send the link. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl border p-8 shadow-sm">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-xl font-bold mx-auto mb-3">C</div>
-          <h1 className="text-xl font-bold">Create account</h1>
-          <p className="text-sm text-gray-500">{BRAND.name}</p>
+          <div className="w-12 h-12 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-xl font-bold mx-auto mb-3 shadow-sm">
+            C
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Create account</h1>
+          <p className="text-sm text-slate-500 mt-1">{BRAND.name}</p>
         </div>
 
         {sent ? (
-          <div className="text-center">
-            <p className="text-gray-700 mb-2">Check your email</p>
-            <p className="text-sm text-gray-500 mb-4">
-              We sent a link to <strong>{email}</strong>. Click it to finish registration.
+          <div className="text-center" role="status">
+            <p className="font-medium text-slate-900 mb-1">Check your email</p>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              We sent a link to <strong className="text-slate-800">{email}</strong>.
+              Open it to finish registration.
             </p>
-            <Button variant="outline" onClick={() => setSent(false)}>Use different email</Button>
+            <Button variant="outline" fullWidth onClick={() => setSent(false)}>
+              Use a different email
+            </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setRole('candidate')}
-                className={`flex-1 py-2 rounded-md text-sm font-medium ${role === 'candidate' ? 'bg-white shadow text-[#0066FF]' : 'text-gray-600'}`}
-              >
-                Job Seeker
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('business')}
-                className={`flex-1 py-2 rounded-md text-sm font-medium ${role === 'business' ? 'bg-white shadow text-[#0066FF]' : 'text-gray-600'}`}
-              >
-                Business
-              </button>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <div>
+              <span className="cj-label" id="role-label">I am a</span>
+              <div className="flex gap-1 p-1 bg-slate-100 rounded-xl" role="group" aria-labelledby="role-label">
+                <button
+                  type="button"
+                  onClick={() => setRole('candidate')}
+                  className={cn(
+                    'flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]',
+                    role === 'candidate' ? 'bg-white shadow text-[#0066FF]' : 'text-slate-600'
+                  )}
+                >
+                  Job seeker
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('business')}
+                  className={cn(
+                    'flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]',
+                    role === 'business' ? 'bg-white shadow text-[#0066FF]' : 'text-slate-600'
+                  )}
+                >
+                  Business
+                </button>
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Full name</label>
-              <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full h-11 px-3 border rounded-lg" />
+              <label htmlFor="reg-name" className="cj-label">Full name</label>
+              <input
+                id="reg-name"
+                required
+                autoComplete="name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="cj-input"
+                placeholder="Your full name"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Phone</label>
-              <input required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full h-11 px-3 border rounded-lg" placeholder="98XXXXXXXX" />
+              <label htmlFor="reg-phone" className="cj-label">Phone</label>
+              <input
+                id="reg-phone"
+                required
+                type="tel"
+                autoComplete="tel"
+                inputMode="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="cj-input"
+                placeholder="98XXXXXXXX"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full h-11 px-3 border rounded-lg" />
+              <label htmlFor="reg-email" className="cj-label">Email</label>
+              <input
+                id="reg-email"
+                required
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="cj-input"
+                placeholder="you@example.com"
+              />
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" fullWidth size="lg" disabled={loading}>
+            {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+            <Button type="submit" fullWidth size="lg" loading={loading}>
               {loading ? 'Sending…' : 'Continue with email'}
             </Button>
           </form>
         )}
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account? <Link to="/login" className="text-[#0066FF]">Login</Link>
+        <p className="text-center text-sm text-slate-500 mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-[#0066FF] font-medium hover:underline">Log in</Link>
         </p>
       </div>
     </div>

@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -35,13 +36,21 @@ export default function ProfilePage() {
           setPhone(authProfile.phone || '');
         }
       })
-      .catch(() => setError('Could not load profile'))
+      .catch(() => setError("We couldn't load your profile."))
       .finally(() => setLoading(false));
   }, [user, authProfile]);
 
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!fullName.trim() || fullName.trim().length < 2) errs.fullName = 'Enter your full name';
+    if (!phone.trim() || phone.replace(/\D/g, '').length < 8) errs.phone = 'Enter a valid phone number';
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !validate()) return;
     setSaving(true);
     setError(null);
     setMessage(null);
@@ -54,12 +63,11 @@ export default function ProfilePage() {
         skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
         email: user.email || null,
       });
-      // also update profiles table name/phone
       await refreshProfile();
       setCp(updated);
       setMessage('Profile saved');
     } catch (err: any) {
-      setError(err.message || 'Failed to save');
+      setError(err.message || "We couldn't save your profile.");
     } finally {
       setSaving(false);
     }
@@ -72,108 +80,119 @@ export default function ProfilePage() {
     setError(null);
     setMessage(null);
     try {
-      // ensure profile exists first
       if (!cp) {
+        if (!validate()) {
+          setUploading(false);
+          return;
+        }
         await upsertCandidateProfile(user.id, {
-          full_name: fullName.trim() || 'Candidate',
-          phone: phone.trim() || '9800000000',
+          full_name: fullName.trim(),
+          phone: phone.trim(),
           location,
           email: user.email || null,
         });
       }
-      const path = await uploadCV(user.id, file);
-      setCp((prev) => (prev ? { ...prev, cv_url: path } : prev));
+      await uploadCV(user.id, file);
+      const refreshed = await getMyCandidateProfile(user.id);
+      setCp(refreshed);
       setMessage('CV uploaded successfully');
     } catch (err: any) {
-      setError(err.message || 'Upload failed');
+      setError(err.message || 'Upload failed. Use PDF, DOC, DOCX, JPG or PNG under 5 MB.');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
-  if (loading) return <div className="p-4 text-gray-500">Loading profile…</div>;
+  if (loading) {
+    return <div className="p-6 text-slate-500 text-sm">Loading profile…</div>;
+  }
 
   return (
     <div className="p-4 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold mb-1">My Profile</h1>
+      <h1 className="text-xl font-bold tracking-tight text-slate-900 mb-1">Your profile</h1>
+      <p className="text-sm text-slate-500 mb-4">
+        {cp ? (
+          <>Profile completion <strong className="text-slate-800">{cp.profile_completion}%</strong></>
+        ) : (
+          'Complete required fields so you can apply quickly.'
+        )}
+      </p>
+
+      {/* Progress bar */}
       {cp && (
-        <p className="text-sm text-gray-500 mb-4">
-          Profile completion: <strong>{cp.profile_completion}%</strong>
-        </p>
+        <div className="h-1.5 bg-slate-100 rounded-full mb-6 overflow-hidden" role="progressbar" aria-valuenow={cp.profile_completion} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full bg-[#0066FF] rounded-full transition-all" style={{ width: `${cp.profile_completion}%` }} />
+        </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-4 bg-white rounded-xl border p-4">
+      <form onSubmit={handleSave} className="space-y-4 bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm" noValidate>
         <div>
-          <label className="block text-sm font-medium mb-1">Full name *</label>
+          <label htmlFor="pf-name" className="cj-label">Full name <span className="text-red-500">*</span></label>
           <input
+            id="pf-name"
             required
+            autoComplete="name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full h-11 px-3 border rounded-lg"
-            placeholder="Your full name"
+            className="cj-input"
+            aria-invalid={!!fieldErrors.fullName}
           />
+          {fieldErrors.fullName && <p className="text-xs text-red-600 mt-1">{fieldErrors.fullName}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Phone *</label>
+          <label htmlFor="pf-phone" className="cj-label">Phone <span className="text-red-500">*</span></label>
           <input
+            id="pf-phone"
             required
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full h-11 px-3 border rounded-lg"
+            className="cj-input"
             placeholder="98XXXXXXXX"
+            aria-invalid={!!fieldErrors.phone}
           />
+          {fieldErrors.phone && <p className="text-xs text-red-600 mt-1">{fieldErrors.phone}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Location</label>
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full h-11 px-3 border rounded-lg bg-white"
-          >
+          <label htmlFor="pf-loc" className="cj-label">Location</label>
+          <select id="pf-loc" value={location} onChange={(e) => setLocation(e.target.value)} className="cj-input">
             {LOCATIONS.filter((l) => l !== 'All Nepal').map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Education</label>
-          <input
-            value={education}
-            onChange={(e) => setEducation(e.target.value)}
-            className="w-full h-11 px-3 border rounded-lg"
-            placeholder="e.g. +2, Bachelor"
-          />
+          <label htmlFor="pf-edu" className="cj-label">Education <span className="text-slate-400 font-normal">(optional)</span></label>
+          <input id="pf-edu" value={education} onChange={(e) => setEducation(e.target.value)} className="cj-input" placeholder="e.g. +2, Bachelor" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Skills (comma separated)</label>
-          <input
-            value={skills}
-            onChange={(e) => setSkills(e.target.value)}
-            className="w-full h-11 px-3 border rounded-lg"
-            placeholder="Waiter, Customer service"
-          />
+          <label htmlFor="pf-skills" className="cj-label">Skills <span className="text-slate-400 font-normal">(comma separated)</span></label>
+          <input id="pf-skills" value={skills} onChange={(e) => setSkills(e.target.value)} className="cj-input" placeholder="Waiter, Customer service" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">CV / Resume</label>
+          <label htmlFor="pf-cv" className="cj-label">CV / Resume</label>
           <input
+            id="pf-cv"
             type="file"
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf"
             onChange={handleCV}
             disabled={uploading}
-            className="w-full text-sm"
+            className="w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-100 file:text-slate-800 file:font-medium file:text-sm"
           />
-          {cp?.cv_url && (
-            <p className="text-xs text-green-600 mt-1">CV uploaded ✓</p>
-          )}
-          {uploading && <p className="text-xs text-gray-500 mt-1">Uploading…</p>}
+          <p className="text-xs text-slate-400 mt-1.5">PDF, DOC, DOCX, JPG or PNG · max 5 MB</p>
+          {cp?.cv_url && <p className="text-xs text-emerald-600 mt-1 font-medium">CV on file ✓</p>}
+          {uploading && <p className="text-xs text-slate-500 mt-1">Uploading…</p>}
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {message && <p className="text-sm text-green-600">{message}</p>}
+        {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+        {message && <p className="text-sm text-emerald-600" role="status">{message}</p>}
 
-        <Button type="submit" fullWidth disabled={saving}>
-          {saving ? 'Saving…' : 'Save Profile'}
+        <Button type="submit" fullWidth loading={saving}>
+          {saving ? 'Saving…' : 'Save profile'}
         </Button>
       </form>
     </div>
