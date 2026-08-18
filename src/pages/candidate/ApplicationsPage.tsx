@@ -5,6 +5,8 @@ import { getMyCandidateProfile } from '../../services/candidateService';
 import { applyToJob, getMyApplications, type Application } from '../../services/applicationService';
 import { getJobById } from '../../services/jobService';
 import { Button } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 const STATUS_LABELS: Record<string, string> = {
   applied: 'Applied',
@@ -124,10 +126,11 @@ export default function ApplicationsPage() {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">My Applications</h1>
       {apps.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-600 mb-4">You haven&apos;t applied for any jobs yet.</p>
-          <Link to="/jobs"><Button>Explore Jobs</Button></Link>
-        </div>
+        <EmptyState
+          title="No applications yet"
+          description="When you apply for a job, you'll track status here — from Applied to Placed."
+          action={<Link to="/jobs"><Button>Find jobs</Button></Link>}
+        />
       ) : (
         <div className="space-y-3">
           {apps.map((app) => (
@@ -135,9 +138,7 @@ export default function ApplicationsPage() {
               <div className="font-semibold">{app.jobs?.title || 'Job'}</div>
               <div className="text-sm text-gray-500">{app.jobs?.location}</div>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700">
-                  {STATUS_LABELS[app.status] || app.status}
-                </span>
+                <StatusBadge status={app.status} />
                 <span className="text-xs text-gray-400">
                   {new Date(app.applied_at).toLocaleDateString()}
                 </span>
