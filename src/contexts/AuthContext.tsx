@@ -26,27 +26,58 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const VALID_ROLES: Role[] = ['candidate', 'business', 'owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, authUser?: User | null) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('id, role, full_name, phone, email, avatar_url')
       .eq('id', userId)
-      .single();
-    if (!error && data) {
-      setProfile(data as Profile);
-    } else {
+      .maybeSingle();
+
+    if (error) {
       setProfile(null);
+      return;
     }
+
+    let p = data as Profile | null;
+
+    // Sync role / name from auth metadata on first login (register chose candidate or business)
+    if (p && authUser?.user_metadata) {
+      const metaRole = authUser.user_metadata.role as string | undefined;
+      const metaName = authUser.user_metadata.full_name as string | undefined;
+      const metaPhone = authUser.user_metadata.phone as string | undefined;
+      const updates: Record<string, string> = {};
+
+      if (metaRole && VALID_ROLES.includes(metaRole as Role) && p.role === 'candidate' && metaRole !== 'candidate') {
+        // only elevate from default candidate → business (never auto-elevate to admin)
+        if (metaRole === 'business') updates.role = 'business';
+      }
+      if (metaName && !p.full_name) updates.full_name = metaName;
+      if (metaPhone && !p.phone) updates.phone = metaPhone;
+
+      if (Object.keys(updates).length > 0) {
+        const { data: updated } = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('id', userId)
+          .select('id, role, full_name, phone, email, avatar_url')
+          .single();
+        if (updated) p = updated as Profile;
+      }
+    }
+
+    setProfile(p);
   };
 
   const refreshProfile = async () => {
-    if (user) await fetchProfile(user.id);
+    if (user) await fetchProfile(user.id, user);
   };
 
   useEffect(() => {
@@ -54,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
+        fetchProfile(session.user.id, session.user).finally(() => setLoading(false));
       } else {
         setLoading(false);
       }
@@ -64,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user);
       } else {
         setProfile(null);
       }

@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { createNotification } from './notificationService';
 
 export interface Application {
   id: string;
@@ -8,7 +9,7 @@ export interface Application {
   cover_message: string | null;
   applied_at: string;
   jobs?: { title: string; location: string; status: string } | null;
-  candidate_profiles?: { full_name: string; phone: string; location: string | null; cv_url: string | null } | null;
+  candidate_profiles?: { full_name: string; phone: string; location: string | null; cv_url: string | null; user_id?: string } | null;
 }
 
 export async function applyToJob(params: {
@@ -16,7 +17,6 @@ export async function applyToJob(params: {
   candidateId: string;
   coverMessage?: string;
 }) {
-  // prevent duplicate via unique constraint; also check first for friendly error
   const { data: existing } = await supabase
     .from('applications')
     .select('id')
@@ -44,7 +44,6 @@ export async function applyToJob(params: {
     throw error;
   }
 
-  // history row
   await supabase.from('application_status_history').insert({
     application_id: data.id,
     from_status: null,
@@ -67,7 +66,7 @@ export async function getMyApplications(candidateId: string) {
 export async function getAllApplications(filters?: { status?: string }) {
   let q = supabase
     .from('applications')
-    .select('*, jobs(title, location), candidate_profiles(full_name, phone, location, cv_url)')
+    .select('*, jobs(title, location), candidate_profiles(full_name, phone, location, cv_url, user_id)')
     .order('applied_at', { ascending: false });
 
   if (filters?.status) q = q.eq('status', filters.status);
@@ -86,11 +85,10 @@ export async function updateApplicationStatus(
     .from('applications')
     .update({ status: newStatus })
     .eq('id', applicationId)
-    .select()
+    .select('*, candidate_profiles(user_id)')
     .single();
   if (error) throw error;
 
-  // history is also written by trigger; notes can go to audit if needed
   if (notes) {
     await supabase.from('application_status_history').insert({
       application_id: applicationId,
@@ -98,5 +96,30 @@ export async function updateApplicationStatus(
       notes,
     });
   }
+
+  try {
+    const userId = (data as any)?.candidate_profiles?.user_id;
+    if (userId) {
+      const labels: Record<string, string> = {
+        under_review: 'Your application is under review',
+        shortlisted: 'You have been shortlisted',
+        interview: 'Interview update from CareerJob',
+        selected: 'You have been selected',
+        placed: 'Congratulations — you are placed',
+        rejected: 'Application update from CareerJob',
+      };
+      await createNotification({
+        userId,
+        title: labels[newStatus] || 'Application update',
+        body: `Status: ${newStatus.replace('_', ' ')}`,
+        type: 'application',
+        entityType: 'application',
+        entityId: applicationId,
+      });
+    }
+  } catch {
+    // non-blocking
+  }
+
   return data;
 }
