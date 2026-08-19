@@ -6,7 +6,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { BRAND, LOCATIONS, CONTACT } from '../lib/config';
 import { searchJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
-import { JobCard } from '../components/ui/JobCard';
+import { HomeJobCard } from '../components/ui/HomeJobCard';
 import { Seo } from '../components/Seo';
 
 export default function HomePage() {
@@ -121,7 +121,7 @@ export default function HomePage() {
 
       {/* Latest jobs — always visible */}
       <section className="py-12 md:py-16 bg-[#F7F9FC] border-b border-[#E8ECF1]">
-        <div className="cj-container max-w-3xl">
+        <div className="cj-container max-w-3xl md:max-w-4xl">
           <div className="flex items-end justify-between gap-3 mb-6">
             <div>
               <p className="cj-eyebrow mb-1.5">Open roles</p>
@@ -152,9 +152,9 @@ export default function HomePage() {
           )}
 
           {!jobsLoading && latest.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-2.5 sm:space-y-3">
               {latest.map((job, i) => (
-                <JobCard key={job.id} job={job} featured={i === 0} />
+                <HomeJobCard key={job.id} job={job} featured={i === 0} />
               ))}
             </div>
           )}
