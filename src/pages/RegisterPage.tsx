@@ -48,9 +48,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50">
       <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-xl font-bold mx-auto mb-3 shadow-sm">
-            C
-          </div>
+          <img src="/logo.png" alt="" className="w-14 h-14 object-contain mx-auto mb-3" width="56" height="56" />
           <h1 className="text-xl font-bold tracking-tight text-slate-900">Create account</h1>
           <p className="text-sm text-slate-500 mt-1">{BRAND.name}</p>
         </div>

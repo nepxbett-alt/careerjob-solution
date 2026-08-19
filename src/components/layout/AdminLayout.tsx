@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/cn';
+import { BrandLogo } from '../BrandLogo';
 
 const items = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -49,8 +50,9 @@ export default function AdminLayout() {
     <div className="min-h-screen flex bg-slate-50">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-56 flex-col bg-slate-900 text-white shrink-0">
-        <div className="h-14 flex items-center px-4 font-semibold border-b border-slate-700 tracking-tight">
-          CareerJob Admin
+        <div className="h-14 flex items-center px-3 border-b border-slate-700 gap-2">
+          <BrandLogo to="/admin" size="sm" showWordmark={false} className="brightness-0 invert" />
+          <span className="font-semibold tracking-tight text-sm">Admin</span>
         </div>
         {nav}
         <div className="p-4 border-t border-slate-700 text-xs text-slate-400">
@@ -84,7 +86,10 @@ export default function AdminLayout() {
               className="w-64 max-w-[80vw] h-full bg-slate-900 text-white flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="h-14 flex items-center px-4 font-semibold border-b border-slate-700">CareerJob Admin</div>
+              <div className="h-14 flex items-center px-3 border-b border-slate-700 gap-2">
+                <img src="/logo.png" alt="" className="h-8 w-8 object-contain brightness-0 invert" />
+                <span className="font-semibold text-sm">Admin</span>
+              </div>
               {nav}
               <button type="button" onClick={() => signOut()} className="p-4 text-left text-sm text-slate-300 border-t border-slate-700">
                 Log out
