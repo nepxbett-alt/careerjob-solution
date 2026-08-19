@@ -63,7 +63,10 @@ export default function InterviewsPage() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-xl font-bold">Interviews</h1>
+        <div>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">Interviews</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Schedule from shortlisted applications · notify candidate</p>
+      </div>
         <Button size="sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Cancel' : 'Schedule interview'}
         </Button>
@@ -113,7 +116,7 @@ export default function InterviewsPage() {
       )}
 
       {loading && <p className="text-gray-500">Loading…</p>}
-      {!loading && interviews.length === 0 && <p className="text-gray-500">No interviews scheduled.</p>}
+      {!loading && interviews.length === 0 && <p className="text-slate-500 text-sm">No interviews scheduled. Shortlist a candidate, then schedule here.</p>}
 
       <div className="space-y-2">
         {interviews.map((iv) => (

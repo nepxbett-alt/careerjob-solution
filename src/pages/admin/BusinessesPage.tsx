@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react';
-import { getAllBusinessRequests, updateRequestStatus, createJobFromRequest, publishJob } from '../../services/businessService';
+import { Link } from 'react-router-dom';
+import { Phone, Building2 } from 'lucide-react';
+import {
+  getAllBusinessRequests,
+  updateRequestStatus,
+  createJobFromRequest,
+  publishJob,
+} from '../../services/businessService';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 export default function BusinessesPage() {
   const { user } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'pending' | 'all'>('pending');
 
   const load = () => {
     setLoading(true);
@@ -17,26 +27,35 @@ export default function BusinessesPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
-  const acceptAndCreateJob = async (req: any) => {
-    if (!user || !confirm('Accept request and create draft job?')) return;
+  const visible = filter === 'pending'
+    ? requests.filter((r) => r.status === 'submitted' || r.status === 'under_review')
+    : requests;
+
+  const acceptAndCreateJob = async (req: any, publishNow: boolean) => {
+    if (!user) return;
+    const msg = publishNow
+      ? 'Accept this request, create a job, and publish it for candidates?'
+      : 'Accept this request and create a draft job (not visible to candidates yet)?';
+    if (!confirm(msg)) return;
     setBusy(req.id);
     try {
       const job = await createJobFromRequest(req, user.id);
-      if (confirm('Job created as draft. Publish it now so candidates can see it?')) {
-        await publishJob(job.id);
-      }
+      if (publishNow) await publishJob(job.id);
+      alert(publishNow ? 'Job published. Candidates can see it now.' : 'Draft job created. Publish from Jobs when ready.');
       load();
     } catch (e: any) {
-      alert(e.message || 'Failed');
+      alert(e.message || 'Could not accept request');
     } finally {
       setBusy(null);
     }
   };
 
   const reject = async (id: string) => {
-    if (!confirm('Reject this request?')) return;
+    if (!confirm('Reject this hiring request?')) return;
     setBusy(id);
     try {
       await updateRequestStatus(id, 'rejected');
@@ -46,31 +65,135 @@ export default function BusinessesPage() {
     }
   };
 
+  const markReview = async (id: string) => {
+    setBusy(id);
+    try {
+      await updateRequestStatus(id, 'under_review');
+      load();
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-6">Business Hiring Requests</h1>
-      {loading && <p className="text-gray-500">Loading…</p>}
-      {!loading && requests.length === 0 && <p className="text-gray-500">No requests yet.</p>}
+    <div className="max-w-4xl">
+      <div className="mb-5">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">Hiring requests</h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Business submits → CareerJob accepts → job created → publish for candidates
+        </p>
+      </div>
+
+      <div className="flex gap-2 mb-5">
+        <button
+          type="button"
+          onClick={() => setFilter('pending')}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium border min-h-[36px] ${
+            filter === 'pending' ? 'bg-[#0066FF] text-white border-[#0066FF]' : 'bg-white border-slate-200 text-slate-600'
+          }`}
+        >
+          Pending
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter('all')}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium border min-h-[36px] ${
+            filter === 'all' ? 'bg-[#0066FF] text-white border-[#0066FF]' : 'bg-white border-slate-200 text-slate-600'
+          }`}
+        >
+          All
+        </button>
+      </div>
+
+      {loading && <p className="text-sm text-slate-500">Loading…</p>}
+      {!loading && visible.length === 0 && (
+        <EmptyState
+          title={filter === 'pending' ? 'No pending requests' : 'No hiring requests yet'}
+          description="When a business submits a hiring request, it appears here for acceptance."
+        />
+      )}
+
       <div className="space-y-3">
-        {requests.map((r) => (
-          <div key={r.id} className="bg-white border rounded-xl p-4">
-            <div className="font-semibold">{r.position_title} × {r.number_required}</div>
-            <div className="text-sm text-gray-600">{r.location} · {r.organizations?.name || 'Business'}</div>
-            <div className="text-xs text-gray-400 mt-1">
-              Status: <span className="capitalize">{r.status.replace('_', ' ')}</span> · {new Date(r.created_at).toLocaleDateString()}
-            </div>
-            {r.status === 'submitted' || r.status === 'under_review' ? (
-              <div className="flex gap-2 mt-3">
-                <Button size="sm" disabled={busy === r.id} onClick={() => acceptAndCreateJob(r)}>
-                  Accept & Create Job
-                </Button>
-                <Button size="sm" variant="danger" disabled={busy === r.id} onClick={() => reject(r.id)}>
-                  Reject
-                </Button>
+        {visible.map((r) => {
+          const pending = r.status === 'submitted' || r.status === 'under_review';
+          const org = r.organizations;
+          return (
+            <article key={r.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <div className="flex flex-wrap justify-between gap-2 mb-2">
+                <div>
+                  <h2 className="font-semibold text-slate-900">
+                    {r.position_title}
+                    {r.number_required ? (
+                      <span className="text-slate-500 font-normal"> × {r.number_required}</span>
+                    ) : null}
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-0.5">
+                    {r.location}
+                    {r.job_type ? ` · ${String(r.job_type).replace('-', ' ')}` : ''}
+                  </p>
+                </div>
+                <StatusBadge status={r.status} />
               </div>
-            ) : null}
-          </div>
-        ))}
+
+              <div className="flex items-start gap-2 text-sm text-slate-600 mb-2">
+                <Building2 className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" aria-hidden />
+                <div>
+                  <span className="font-medium text-slate-800">{org?.name || 'Business'}</span>
+                  {org?.contact_person && <span className="text-slate-500"> · {org.contact_person}</span>}
+                  {org?.phone && (
+                    <a href={`tel:${org.phone}`} className="flex items-center gap-1 text-[#0066FF] mt-0.5">
+                      <Phone className="w-3.5 h-3.5" aria-hidden /> {org.phone}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {(r.salary_min || r.salary_max || r.experience_required) && (
+                <p className="text-xs text-slate-500 mb-2">
+                  {r.salary_min && r.salary_max
+                    ? `Salary Rs. ${Number(r.salary_min).toLocaleString()}–${Number(r.salary_max).toLocaleString()}`
+                    : null}
+                  {r.experience_required ? ` · Experience: ${r.experience_required}` : ''}
+                </p>
+              )}
+
+              {(r.responsibilities || r.additional_requirements) && (
+                <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-3 mb-3 whitespace-pre-wrap">
+                  {r.responsibilities || r.additional_requirements}
+                </p>
+              )}
+
+              <p className="text-xs text-slate-400 mb-3">
+                Submitted {new Date(r.created_at).toLocaleString()}
+              </p>
+
+              {pending && (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" disabled={!!busy} loading={busy === r.id} onClick={() => acceptAndCreateJob(r, true)}>
+                    Accept & publish job
+                  </Button>
+                  <Button size="sm" variant="outline" disabled={!!busy} onClick={() => acceptAndCreateJob(r, false)}>
+                    Accept as draft
+                  </Button>
+                  {r.status === 'submitted' && (
+                    <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => markReview(r.id)}>
+                      Mark under review
+                    </Button>
+                  )}
+                  <Button size="sm" variant="danger" disabled={!!busy} onClick={() => reject(r.id)}>
+                    Reject
+                  </Button>
+                </div>
+              )}
+
+              {r.status === 'accepted' && (
+                <Link to="/admin/jobs">
+                  <Button size="sm" variant="outline">Open jobs →</Button>
+                </Link>
+              )}
+            </article>
+          );
+        })}
       </div>
     </div>
   );
