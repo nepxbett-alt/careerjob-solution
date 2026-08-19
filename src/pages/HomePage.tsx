@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { BRAND, LOCATIONS, CONTACT } from '../lib/config';
-import { searchJobs } from '../services/jobService';
+import { getFeaturedJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { HomeJobCard } from '../components/ui/HomeJobCard';
 import { Seo } from '../components/Seo';
@@ -19,14 +19,9 @@ export default function HomePage() {
 
   useEffect(() => {
     setJobsLoading(true);
-    searchJobs({ location: 'Pokhara', page: 1, limit: 8 })
-      .then(({ jobs }) => {
-        if (jobs.length > 0) setLatest(jobs);
-        else {
-          return searchJobs({ page: 1, limit: 8 }).then(({ jobs: all }) => setLatest(all));
-        }
-      })
-      .catch(() => {})
+    getFeaturedJobs(6)
+      .then(setLatest)
+      .catch(() => setLatest([]))
       .finally(() => setJobsLoading(false));
   }, []);
 
@@ -124,9 +119,9 @@ export default function HomePage() {
         <div className="cj-container max-w-3xl md:max-w-4xl">
           <div className="flex items-end justify-between gap-3 mb-6">
             <div>
-              <p className="cj-eyebrow mb-1.5">Open roles</p>
-              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#0B1220]">Jobs hiring now</h2>
-              <p className="text-sm text-[#6B7789] mt-1">Reviewed by CareerJob · Apply in minutes</p>
+              <p className="cj-eyebrow mb-1.5">Top picks</p>
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#0B1220]">Featured jobs</h2>
+              <p className="text-sm text-[#6B7789] mt-1">Selected by CareerJob · Apply in minutes</p>
             </div>
             <Link
               to="/jobs"

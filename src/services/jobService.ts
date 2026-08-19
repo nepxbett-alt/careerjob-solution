@@ -19,6 +19,7 @@ export interface Job {
   application_deadline: string | null;
   status: string;
   public_employer_label: string | null;
+  is_featured?: boolean;
   created_at: string;
   published_at: string | null;
   category_id: string | null;
@@ -34,6 +35,9 @@ export interface JobFilters {
   limit?: number;
 }
 
+const JOB_SELECT =
+  'id, title, location, location_detail, salary_display, salary_min, salary_max, job_type, experience_required, education_required, description, responsibilities, requirements, skills, benefits, application_deadline, status, public_employer_label, is_featured, created_at, published_at, category_id, job_categories(name, slug)';
+
 export async function searchJobs(filters: JobFilters = {}) {
   const page = filters.page || 1;
   const limit = filters.limit || 20;
@@ -42,9 +46,10 @@ export async function searchJobs(filters: JobFilters = {}) {
 
   let query = supabase
     .from('jobs')
-    .select('*, job_categories(name, slug)', { count: 'exact' })
+    .select(JOB_SELECT, { count: 'exact' })
     .eq('status', 'published')
     .eq('approved_by_agency', true)
+    .order('is_featured', { ascending: false })
     .order('published_at', { ascending: false });
 
   if (filters.location && filters.location !== 'All Nepal') {
@@ -66,10 +71,48 @@ export async function searchJobs(filters: JobFilters = {}) {
   return { jobs: (data || []) as Job[], total: count || 0, page, limit };
 }
 
+/** Top jobs for homepage — admin-flagged featured first, then latest */
+export async function getFeaturedJobs(limit = 6) {
+  const { data: featured, error: fErr } = await supabase
+    .from('jobs')
+    .select(JOB_SELECT)
+    .eq('status', 'published')
+    .eq('approved_by_agency', true)
+    .eq('is_featured', true)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (fErr) throw fErr;
+
+  const featuredList = (featured || []) as Job[];
+  if (featuredList.length >= limit) {
+    return featuredList.slice(0, limit);
+  }
+
+  const need = limit - featuredList.length;
+  const excludeIds = featuredList.map((j) => j.id);
+
+  let q = supabase
+    .from('jobs')
+    .select(JOB_SELECT)
+    .eq('status', 'published')
+    .eq('approved_by_agency', true)
+    .order('published_at', { ascending: false })
+    .limit(need);
+
+  if (excludeIds.length) {
+    q = q.not('id', 'in', `(${excludeIds.join(',')})`);
+  }
+
+  const { data: rest, error } = await q;
+  if (error) throw error;
+  return [...featuredList, ...((rest || []) as Job[])];
+}
+
 export async function getJobById(id: string) {
   const { data, error } = await supabase
     .from('jobs')
-    .select('*, job_categories(name, slug)')
+    .select(JOB_SELECT)
     .eq('id', id)
     .eq('status', 'published')
     .eq('approved_by_agency', true)
@@ -79,12 +122,13 @@ export async function getJobById(id: string) {
   return data as Job;
 }
 
-export async function getCategories() {
+export async function setJobFeatured(jobId: string, featured: boolean) {
   const { data, error } = await supabase
-    .from('job_categories')
-    .select('*')
-    .eq('is_active', true)
-    .order('sort_order');
+    .from('jobs')
+    .update({ is_featured: featured } as never)
+    .eq('id', jobId)
+    .select('id, is_featured')
+    .single();
   if (error) throw error;
-  return data || [];
+  return data;
 }
