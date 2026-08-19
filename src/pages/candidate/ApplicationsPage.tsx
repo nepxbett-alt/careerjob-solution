@@ -8,18 +8,6 @@ import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState } from '../../components/ui/EmptyState';
 
-const STATUS_LABELS: Record<string, string> = {
-  applied: 'Applied',
-  under_review: 'Under Review',
-  shortlisted: 'Shortlisted',
-  interview: 'Interview',
-  selected: 'Selected',
-  placed: 'Placed',
-  rejected: 'Rejected',
-  withdrawn: 'Withdrawn',
-  closed: 'Closed',
-};
-
 export default function ApplicationsPage() {
   const { user } = useAuth();
   const [params] = useSearchParams();
