@@ -1,23 +1,23 @@
 import { cn } from '../../lib/cn';
 
 const STYLES: Record<string, string> = {
-  applied: 'bg-slate-100 text-slate-700',
-  under_review: 'bg-sky-50 text-sky-800',
-  shortlisted: 'bg-violet-50 text-violet-800',
-  interview: 'bg-amber-50 text-amber-900',
-  selected: 'bg-emerald-50 text-emerald-800',
-  placed: 'bg-emerald-100 text-emerald-900',
-  rejected: 'bg-red-50 text-red-700',
-  withdrawn: 'bg-slate-100 text-slate-500',
-  closed: 'bg-slate-100 text-slate-500',
-  published: 'bg-emerald-50 text-emerald-800',
-  draft: 'bg-slate-100 text-slate-600',
-  paused: 'bg-amber-50 text-amber-800',
-  submitted: 'bg-sky-50 text-sky-800',
-  pending: 'bg-amber-50 text-amber-800',
-  scheduled: 'bg-violet-50 text-violet-800',
-  completed: 'bg-emerald-50 text-emerald-800',
-  cancelled: 'bg-slate-100 text-slate-500',
+  applied: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200/80',
+  under_review: 'bg-sky-50 text-sky-800 ring-1 ring-sky-100',
+  shortlisted: 'bg-violet-50 text-violet-800 ring-1 ring-violet-100',
+  interview: 'bg-amber-50 text-amber-900 ring-1 ring-amber-100',
+  selected: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  placed: 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200/80',
+  rejected: 'bg-red-50 text-red-700 ring-1 ring-red-100',
+  withdrawn: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
+  closed: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
+  published: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  draft: 'bg-slate-100 text-slate-600 ring-1 ring-slate-200/80',
+  paused: 'bg-amber-50 text-amber-800 ring-1 ring-amber-100',
+  submitted: 'bg-sky-50 text-sky-800 ring-1 ring-sky-100',
+  pending: 'bg-amber-50 text-amber-800 ring-1 ring-amber-100',
+  scheduled: 'bg-violet-50 text-violet-800 ring-1 ring-violet-100',
+  completed: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  cancelled: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
 };
 
 const LABELS: Record<string, string> = {
@@ -45,8 +45,8 @@ export function StatusBadge({ status, className }: { status: string; className?:
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize',
-        STYLES[key] || 'bg-slate-100 text-slate-700',
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-tight',
+        STYLES[key] || 'bg-slate-100 text-slate-700 ring-1 ring-slate-200/80',
         className
       )}
     >

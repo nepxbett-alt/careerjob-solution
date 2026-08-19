@@ -16,20 +16,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-colors duration-150',
+          'inline-flex items-center justify-center gap-2 font-semibold rounded-[12px] transition-all duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0066FF]',
           'disabled:opacity-50 disabled:pointer-events-none',
           'active:scale-[0.98]',
           {
-            'bg-[#0066FF] text-white hover:bg-[#0052CC] shadow-sm': variant === 'primary',
-            'bg-slate-100 text-slate-900 hover:bg-slate-200': variant === 'secondary',
-            'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-400': variant === 'outline',
-            'text-slate-700 hover:bg-slate-100': variant === 'ghost',
+            'bg-[#0066FF] text-white hover:bg-[#0052CC] shadow-sm shadow-blue-600/20': variant === 'primary',
+            'bg-slate-100 text-slate-900 hover:bg-slate-200/90': variant === 'secondary',
+            'border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-sm': variant === 'outline',
+            'text-slate-600 hover:bg-slate-100 hover:text-slate-900': variant === 'ghost',
             'bg-red-600 text-white hover:bg-red-700': variant === 'danger',
             'bg-emerald-600 text-white hover:bg-emerald-700': variant === 'success',
-            'h-9 px-3 text-sm min-w-[2.25rem]': size === 'sm',
-            'h-11 px-4 text-sm min-w-[2.75rem]': size === 'md',
-            'h-12 px-6 text-base min-w-[3rem]': size === 'lg',
+            'h-9 px-3.5 text-sm min-w-[2.25rem]': size === 'sm',
+            'h-11 px-5 text-sm min-w-[2.75rem]': size === 'md',
+            'h-12 px-6 text-[0.95rem] min-w-[3rem]': size === 'lg',
             'w-full': fullWidth,
           },
           className

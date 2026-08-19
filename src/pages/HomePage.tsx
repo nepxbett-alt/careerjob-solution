@@ -37,23 +37,23 @@ export default function HomePage() {
         canonical="https://careerjobsolution.com.np/"
       />
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-100">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#E8F1FF_0%,_transparent_55%)] pointer-events-none" />
-        <div className="cj-container relative pt-12 pb-14 md:pt-20 md:pb-24">
+      <section className="relative overflow-hidden border-b border-[#E8ECF1]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,_#EEF4FF_0%,_transparent_60%)] pointer-events-none" />
+        <div className="cj-container relative pt-14 pb-16 md:pt-24 md:pb-28">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 mb-5 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden />
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur border border-[#E8ECF1] px-3.5 py-1.5 text-xs font-medium text-[#3D4A5C] mb-6 shadow-[0_1px_2px_rgba(11,18,32,0.04)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100" aria-hidden />
               Recruitment agency · Pokhara, Nepal
             </div>
-            <h1 className="text-[1.85rem] sm:text-4xl md:text-[2.75rem] font-bold text-slate-900 tracking-tight leading-[1.15] mb-4">
+            <h1 className="cj-display text-[1.9rem] sm:text-4xl md:text-[2.85rem] mb-4">
               Find your next job in Nepal
             </h1>
             <p className="text-base md:text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Discover trusted opportunities from {BRAND.name}. We review applications and stay with you until placement.
             </p>
 
-            <form onSubmit={handleSearch} className="mb-6" role="search">
-              <div className="flex flex-col sm:flex-row gap-2 p-2 bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/60 text-left">
+            <form onSubmit={handleSearch} className="mb-7" role="search">
+              <div className="flex flex-col sm:flex-row gap-2 p-2 sm:p-2.5 bg-white rounded-[1.25rem] border border-[#E8ECF1] shadow-[0_8px_30px_rgba(0,102,255,0.08),0_2px_8px_rgba(11,18,32,0.04)] text-left">
                 <div className="flex-1 relative min-w-0">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden />
                   <label htmlFor="home-search" className="sr-only">Search jobs</label>
