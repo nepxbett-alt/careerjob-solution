@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Allow: /jobs
+Allow: /jobs/
+Allow: /about
+Allow: /how-it-works
+Allow: /for-businesses
+Allow: /contact
+Allow: /faq
+Allow: /privacy
+Allow: /terms
+
+Disallow: /candidate
+Disallow: /candidate/
+Disallow: /business
+Disallow: /business/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://careerjobsolution.com.np/sitemap.xml

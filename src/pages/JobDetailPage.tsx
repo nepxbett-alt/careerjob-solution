@@ -10,6 +10,7 @@ import { getMyCandidateProfile } from '../services/candidateService';
 import { isJobSaved, saveJob, unsaveJob } from '../services/savedJobService';
 import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from '../components/ui/Skeleton';
+import { Seo } from '../components/Seo';
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -92,8 +93,39 @@ export default function JobDetailPage() {
   const whatsappMsg = `Hello CareerJob, I am interested in the ${job.title} position in ${job.location}.`;
   const locationLabel = job.location_detail ? `${job.location_detail}, ${job.location}` : job.location;
 
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://careerjobsolution.com.np';
+  const canonical = `${origin}/jobs/${job.id}`;
+  const desc = (job.description || `${job.title} in ${job.location}. Apply via CareerJob Solution.`).slice(0, 160);
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: job.title,
+    description: job.description || job.title,
+    datePosted: job.published_at || job.created_at,
+    employmentType: (job.job_type || 'FULL_TIME').toUpperCase().replace('-', '_'),
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: job.public_employer_label || 'CareerJob Solution',
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: job.location,
+        addressCountry: 'NP',
+      },
+    },
+    ...(job.application_deadline ? { validThrough: job.application_deadline } : {}),
+  };
+
   return (
     <div className="cj-container max-w-3xl py-8 pb-28 md:pb-12">
+      <Seo
+        title={`${job.title} in ${job.location} | CareerJob Solution`}
+        description={desc}
+        canonical={canonical}
+        jsonLd={jsonLd}
+      />
       <Link to="/jobs" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0066FF] mb-6 min-h-[44px]">
         <ArrowLeft className="w-4 h-4" aria-hidden /> Back to jobs
       </Link>

@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { JobCard } from '../components/ui/JobCard';
 import { JobCardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Seo } from '../components/Seo';
 import { LOCATIONS } from '../lib/config';
 
 export default function JobsPage() {
@@ -45,6 +46,7 @@ export default function JobsPage() {
 
   return (
     <div className="cj-container cj-page max-w-3xl">
+      <Seo title="Find jobs in Nepal | CareerJob Solution" description="Search jobs in Pokhara and across Nepal. Apply through CareerJob Solution." canonical="https://careerjobsolution.com.np/jobs" />
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Find jobs</h1>
       <p className="text-sm text-slate-500 mb-6">Search roles across Pokhara and Nepal. CareerJob reviews every application.</p>
 

@@ -1,14 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Briefcase, Users, ArrowRight, Shield, MessageCircle, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { BRAND, LOCATIONS, CONTACT } from '../lib/config';
+import { searchJobs } from '../services/jobService';
+import type { Job } from '../services/jobService';
+import { JobCard } from '../components/ui/JobCard';
+import { Seo } from '../components/Seo';
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [location, setLocation] = useState('Pokhara');
   const navigate = useNavigate();
+  const [latest, setLatest] = useState<Job[]>([]);
+
+  useEffect(() => {
+    searchJobs({ location: 'Pokhara', page: 1, limit: 6 })
+      .then(({ jobs }) => setLatest(jobs))
+      .catch(() => {});
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +31,11 @@ export default function HomePage() {
 
   return (
     <div>
+      <Seo
+        title="CareerJob Solution | Jobs in Pokhara & Nepal"
+        description="Find jobs in Pokhara and across Nepal. Apply simply — CareerJob reviews every application."
+        canonical="https://careerjobsolution.com.np/"
+      />
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-slate-100">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#E8F1FF_0%,_transparent_55%)] pointer-events-none" />
@@ -30,11 +46,10 @@ export default function HomePage() {
               Recruitment agency · Pokhara, Nepal
             </div>
             <h1 className="text-[1.85rem] sm:text-4xl md:text-[2.75rem] font-bold text-slate-900 tracking-tight leading-[1.15] mb-4">
-              Find work. Hire people.<br className="hidden sm:block" />
-              <span className="text-[#0066FF]"> We handle the middle.</span>
+              Find your next job in Nepal
             </h1>
             <p className="text-base md:text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
-              {BRAND.name} connects job seekers and local businesses — simple applications, real review, WhatsApp support.
+              Discover trusted opportunities from {BRAND.name}. We review applications and stay with you until placement.
             </p>
 
             <form onSubmit={handleSearch} className="mb-6" role="search">
@@ -93,6 +108,29 @@ export default function HomePage() {
           <span className="inline-flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#0066FF]" aria-hidden /> No pay-to-apply for candidates</span>
         </div>
       </section>
+
+
+      {/* Latest jobs */}
+      {latest.length > 0 && (
+        <section className="py-12 md:py-14 border-b border-slate-100">
+          <div className="cj-container max-w-3xl">
+            <div className="flex items-end justify-between gap-3 mb-6">
+              <div>
+                <h2 className="text-xl font-bold tracking-tight text-slate-900">Jobs in Pokhara</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Latest openings reviewed by CareerJob</p>
+              </div>
+              <Link to="/jobs?location=Pokhara" className="text-sm font-semibold text-[#0066FF] shrink-0">
+                See all
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {latest.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* How it works briefly */}
       <section className="py-14 md:py-16 bg-slate-50">

@@ -89,6 +89,7 @@ export async function updateApplicationStatus(
     .single();
   if (error) throw error;
 
+  // Status history is also written by DB trigger; add notes row when provided
   if (notes) {
     await supabase.from('application_status_history').insert({
       application_id: applicationId,
