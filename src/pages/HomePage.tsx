@@ -15,10 +15,19 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [latest, setLatest] = useState<Job[]>([]);
 
+  const [jobsLoading, setJobsLoading] = useState(true);
+
   useEffect(() => {
-    searchJobs({ location: 'Pokhara', page: 1, limit: 6 })
-      .then(({ jobs }) => setLatest(jobs))
-      .catch(() => {});
+    setJobsLoading(true);
+    searchJobs({ location: 'Pokhara', page: 1, limit: 8 })
+      .then(({ jobs }) => {
+        if (jobs.length > 0) setLatest(jobs);
+        else {
+          return searchJobs({ page: 1, limit: 8 }).then(({ jobs: all }) => setLatest(all));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setJobsLoading(false));
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -110,27 +119,57 @@ export default function HomePage() {
       </section>
 
 
-      {/* Latest jobs */}
-      {latest.length > 0 && (
-        <section className="py-12 md:py-14 border-b border-slate-100">
-          <div className="cj-container max-w-3xl">
-            <div className="flex items-end justify-between gap-3 mb-6">
-              <div>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900">Jobs in Pokhara</h2>
-                <p className="text-sm text-slate-500 mt-0.5">Latest openings reviewed by CareerJob</p>
-              </div>
-              <Link to="/jobs?location=Pokhara" className="text-sm font-semibold text-[#0066FF] shrink-0">
-                See all
-              </Link>
+      {/* Latest jobs — always visible */}
+      <section className="py-12 md:py-16 bg-[#F7F9FC] border-b border-[#E8ECF1]">
+        <div className="cj-container max-w-3xl">
+          <div className="flex items-end justify-between gap-3 mb-6">
+            <div>
+              <p className="cj-eyebrow mb-1.5">Open roles</p>
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#0B1220]">Jobs hiring now</h2>
+              <p className="text-sm text-[#6B7789] mt-1">Reviewed by CareerJob · Apply in minutes</p>
             </div>
+            <Link
+              to="/jobs"
+              className="text-sm font-semibold text-[#0066FF] shrink-0 min-h-[44px] inline-flex items-center"
+            >
+              See all jobs
+            </Link>
+          </div>
+
+          {jobsLoading && (
             <div className="space-y-3">
-              {latest.map((job) => (
-                <JobCard key={job.id} job={job} />
+              <div className="cj-skeleton h-28 rounded-2xl" />
+              <div className="cj-skeleton h-28 rounded-2xl" />
+              <div className="cj-skeleton h-28 rounded-2xl" />
+            </div>
+          )}
+
+          {!jobsLoading && latest.length === 0 && (
+            <div className="bg-white border border-[#E8ECF1] rounded-2xl p-8 text-center">
+              <p className="text-sm text-[#6B7789] mb-4">New roles are added regularly. Check back soon or browse all jobs.</p>
+              <Link to="/jobs"><Button size="sm">Browse jobs</Button></Link>
+            </div>
+          )}
+
+          {!jobsLoading && latest.length > 0 && (
+            <div className="space-y-3">
+              {latest.map((job, i) => (
+                <JobCard key={job.id} job={job} featured={i === 0} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          )}
+
+          {!jobsLoading && latest.length > 0 && (
+            <div className="mt-8 text-center">
+              <Link to="/jobs">
+                <Button size="lg" variant="outline" className="rounded-xl min-w-[200px]">
+                  View all jobs
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* How it works briefly */}
       <section className="py-14 md:py-16 bg-slate-50">
