@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, Briefcase } from 'lucide-react';
+import { MapPin, Clock, Briefcase, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
-import { Button } from './Button';
 
 export function JobCard({ job }: { job: Job }) {
   const locationLabel = job.location_detail
@@ -12,17 +11,17 @@ export function JobCard({ job }: { job: Job }) {
   return (
     <Link
       to={`/jobs/${job.id}`}
-      className="group block cj-card p-5 hover:border-[#0066FF]/35 hover:shadow-md transition-all duration-150"
+      className="group block bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-[#0066FF]/35 hover:shadow-md transition-all duration-150 active:scale-[0.99]"
     >
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+      <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
-          <h2 className="font-semibold text-[1.05rem] text-slate-900 tracking-tight group-hover:text-[#0066FF] transition-colors">
+          <h2 className="font-semibold text-[1.05rem] text-slate-900 tracking-tight group-hover:text-[#0066FF] transition-colors leading-snug">
             {job.title}
           </h2>
           {job.public_employer_label && (
             <p className="text-sm text-slate-500 mt-0.5 truncate">{job.public_employer_label}</p>
           )}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-sm text-slate-600">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-[13px] text-slate-600">
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden />
               {locationLabel}
@@ -40,25 +39,23 @@ export function JobCard({ job }: { job: Job }) {
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {job.salary_display && (
-              <span className="text-sm font-medium text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-md">
+              <span className="text-[13px] font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">
                 {job.salary_display}
               </span>
             )}
-            <span className="text-sm text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-md capitalize">
+            <span className="text-[13px] text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg capitalize">
               {job.job_type.replace('-', ' ')}
             </span>
             {job.experience_required && (
-              <span className="text-sm text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-md">
+              <span className="text-[13px] text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
                 {job.experience_required}
               </span>
             )}
           </div>
         </div>
-        <Button size="sm" className="shrink-0 self-start pointer-events-none sm:pointer-events-auto" tabIndex={-1}>
-          View job
-        </Button>
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#0066FF] shrink-0 mt-1 transition-colors" aria-hidden />
       </div>
     </Link>
   );

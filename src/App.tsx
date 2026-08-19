@@ -15,6 +15,7 @@ import TermsPage from './pages/TermsPage';
 import FaqPage from './pages/FaqPage';
 import NotFoundPage from './pages/NotFoundPage';
 import CandidateLayout from './components/layout/CandidateLayout';
+import CandidateHome from './pages/candidate/HomePage';
 import CandidateApplications from './pages/candidate/ApplicationsPage';
 import CandidateProfile from './pages/candidate/ProfilePage';
 import CandidateSaved from './pages/candidate/SavedJobsPage';
@@ -65,7 +66,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<JobsPage />} />
+          <Route index element={<CandidateHome />} />
           <Route path="applications" element={<CandidateApplications />} />
           <Route path="saved" element={<CandidateSaved />} />
           <Route path="profile" element={<CandidateProfile />} />

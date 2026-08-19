@@ -5,36 +5,73 @@ import { Button } from '../components/ui/Button';
 
 export default function ContactPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold mb-2">Contact CareerJob</h1>
-      <p className="text-gray-600 mb-10">We are here to help candidates and businesses in Pokhara and across Nepal.</p>
+    <div className="cj-container max-w-3xl cj-page">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-2">Contact</h1>
+      <p className="text-slate-600 mb-8 max-w-lg leading-relaxed">
+        CareerJob Solution — Pokhara. Call, WhatsApp, or email. We help job seekers and businesses.
+      </p>
 
-      <div className="grid sm:grid-cols-2 gap-6 mb-10">
-        <div className="p-5 rounded-xl border border-gray-200">
-          <div className="flex items-center gap-2 font-semibold mb-2"><Phone className="w-5 h-5 text-[#0066FF]" /> Phone</div>
-          {CONTACT.phones.map((p) => (
-            <a key={p} href={`tel:${p}`} className="block text-gray-700 hover:text-[#0066FF] py-0.5">{p}</a>
-          ))}
-        </div>
-        <div className="p-5 rounded-xl border border-gray-200">
-          <div className="flex items-center gap-2 font-semibold mb-2"><Mail className="w-5 h-5 text-[#0066FF]" /> Email</div>
-          <a href={`mailto:${CONTACT.email}`} className="text-gray-700 hover:text-[#0066FF]">{CONTACT.email}</a>
-        </div>
-        <div className="p-5 rounded-xl border border-gray-200">
-          <div className="flex items-center gap-2 font-semibold mb-2"><MapPin className="w-5 h-5 text-[#0066FF]" /> Office</div>
-          <p className="text-gray-700">{CONTACT.address}</p>
-          <a href={CONTACT.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#0066FF] mt-1 inline-block">Get directions</a>
-        </div>
-        <div className="p-5 rounded-xl border border-gray-200">
-          <div className="flex items-center gap-2 font-semibold mb-2"><Clock className="w-5 h-5 text-[#0066FF]" /> Hours</div>
-          <p className="text-gray-700">{CONTACT.officeHours}</p>
-        </div>
+      <div className="grid sm:grid-cols-2 gap-3 mb-8">
+        {[
+          {
+            icon: Phone,
+            title: 'Phone',
+            body: (
+              <div className="space-y-1">
+                {CONTACT.phones.map((p) => (
+                  <a key={p} href={`tel:${p}`} className="block text-slate-800 hover:text-[#0066FF] font-medium">{p}</a>
+                ))}
+              </div>
+            ),
+          },
+          {
+            icon: Mail,
+            title: 'Email',
+            body: (
+              <a href={`mailto:${CONTACT.email}`} className="text-slate-800 hover:text-[#0066FF] font-medium break-all">
+                {CONTACT.email}
+              </a>
+            ),
+          },
+          {
+            icon: MapPin,
+            title: 'Office',
+            body: (
+              <>
+                <p className="text-slate-800">{CONTACT.address}</p>
+                <a href={CONTACT.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#0066FF] font-medium mt-1 inline-block">
+                  Open in Maps
+                </a>
+              </>
+            ),
+          },
+          {
+            icon: Clock,
+            title: 'Hours',
+            body: <p className="text-slate-800">{CONTACT.officeHours}</p>,
+          },
+        ].map((card) => (
+          <div key={card.title} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center gap-2 font-semibold text-slate-900 mb-2">
+              <card.icon className="w-5 h-5 text-[#0066FF]" aria-hidden />
+              {card.title}
+            </div>
+            {card.body}
+          </div>
+        ))}
+      </div>
+
+      {/* Map placeholder */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-100 h-48 mb-8 flex items-center justify-center text-sm text-slate-500">
+        <a href={CONTACT.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-[#0066FF] font-medium hover:underline">
+          Srijana Chowk, Pokhara — view on Google Maps
+        </a>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
         <WhatsAppButton label="WhatsApp CareerJob" message="Hello CareerJob, I have a question." />
         <a href={`tel:${CONTACT.primaryPhone}`}>
-          <Button variant="outline" size="lg">Call Now</Button>
+          <Button variant="outline" size="lg">Call {CONTACT.primaryPhone}</Button>
         </a>
       </div>
     </div>
