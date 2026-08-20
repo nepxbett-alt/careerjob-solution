@@ -11,7 +11,6 @@ import { Seo } from '../components/Seo';
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
-  const location = 'Pokhara';
   const navigate = useNavigate();
   const [latest, setLatest] = useState<Job[]>([]);
 
@@ -36,8 +35,8 @@ export default function HomePage() {
   return (
     <div>
       <Seo
-        title="CareerJob Solution | Jobs in Pokhara & Nepal"
-        description="Find jobs in Pokhara and across Nepal. Apply simply — CareerJob reviews every application."
+        title="CareerJob Solution | Jobs in Pokhara"
+        description="Find jobs in Pokhara. Apply simply — CareerJob reviews every application."
         canonical="https://careerjobsolution.com.np/"
       />
       {/* Hero */}
@@ -169,7 +168,7 @@ export default function HomePage() {
                 Job seekers
               </h3>
               <ol className="space-y-3 text-sm text-slate-600">
-                {['Search jobs in Pokhara & Nepal', 'Apply with a simple profile + CV', 'We review — then contact you', 'Interview & placement support'].map((t, i) => (
+                {['Search jobs in Pokhara', 'Apply with a simple profile + CV', 'We review — then contact you', 'Interview & placement support'].map((t, i) => (
                   <li key={t} className="flex gap-3">
                     <span className="text-[#0066FF] font-semibold w-5 shrink-0">{i + 1}.</span>
                     {t}

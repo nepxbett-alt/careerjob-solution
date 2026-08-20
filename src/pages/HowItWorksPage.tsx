@@ -14,7 +14,7 @@ export default function HowItWorksPage() {
         <h2 className="text-xl font-semibold mb-4">For job seekers</h2>
         <ol className="space-y-4">
           {[
-            { t: 'Find a job', d: 'Search by title, skill or location (Pokhara, Kathmandu and more).' },
+            { t: 'Find a job', d: 'Search by title, skill or Pokhara area (Lakeside, New Road, and more).' },
             { t: 'Apply online', d: 'Complete a simple profile and apply in under a minute.' },
             { t: 'CareerJob reviews', d: 'Our team reviews every application. We do not auto-reject.' },
             { t: 'Get contacted', d: 'If shortlisted, we contact you for the next step.' },

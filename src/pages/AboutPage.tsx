@@ -11,7 +11,7 @@ export default function AboutPage() {
         {BRAND.tagline}
       </p>
       <p className="text-gray-700 leading-relaxed mb-4">
-        CareerJob Solution is a Nepal-focused recruitment agency based in Pokhara.
+        CareerJob Solution is a Pokhara-focused recruitment agency based at Srijana Chowk.
         We help ordinary job seekers find work and help local businesses hire reliable staff —
         without complicated marketplaces or bidding.
       </p>
