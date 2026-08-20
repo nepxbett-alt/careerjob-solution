@@ -118,7 +118,10 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold tracking-tight text-slate-900 mb-1">Your profile</h1>
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">Your profile</h1>
+        <a href="/candidate/cv" className="text-sm font-semibold text-[#0066FF]">Create CV →</a>
+      </div>
       <p className="text-sm text-slate-500 mb-4">
         {cp ? (
           <>Profile completion <strong className="text-slate-800">{cp.profile_completion}%</strong></>

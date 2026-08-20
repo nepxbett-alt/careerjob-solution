@@ -39,7 +39,7 @@ export default function WalkInPage() {
         .split(/[,，]/)
         .map((s) => s.trim())
         .filter(Boolean);
-      await createWalkInCandidate({
+      const created = await createWalkInCandidate({
         full_name: form.full_name,
         phone: form.phone,
         email: form.email || undefined,
@@ -52,7 +52,7 @@ export default function WalkInPage() {
         availability: form.availability || undefined,
         registeredBy: user?.id,
       });
-      navigate('/admin/candidates');
+      navigate(`/admin/candidates/${(created as { id: string }).id}`);
     } catch (err: any) {
       setError(err.message || 'Could not register candidate.');
     } finally {

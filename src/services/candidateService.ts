@@ -17,6 +17,8 @@ export interface CandidateProfile {
   cv_url: string | null;
   profile_completion: number;
   is_verified: boolean;
+  experience_notes?: string | null;
+  desired_position?: string | null;
 }
 
 export async function getMyCandidateProfile(userId: string) {
@@ -183,4 +185,84 @@ export async function setSeekerStatus(candidateId: string, status: SeekerStatus)
     .single();
   if (error) throw error;
   return data;
+}
+
+/** Persist structured CV fields onto candidate_profiles */
+export async function saveCandidateCvFields(
+  candidateId: string,
+  data: {
+    full_name: string;
+    phone: string;
+    email?: string | null;
+    location?: string | null;
+    headline?: string | null;
+    bio?: string | null;
+    education?: string | null;
+    skills?: string[];
+    languages?: string[] | null;
+    desired_position?: string | null;
+    experience_notes?: string | null;
+  }
+) {
+  const payload = {
+    full_name: data.full_name,
+    phone: data.phone,
+    email: data.email ?? null,
+    location: data.location ?? null,
+    headline: data.headline ?? null,
+    bio: data.bio ?? null,
+    education: data.education ?? null,
+    skills: data.skills ?? [],
+    languages: data.languages ?? [],
+    desired_position: data.desired_position ?? null,
+    experience_notes: data.experience_notes ?? null,
+    profile_completion: calcCompletion({
+      full_name: data.full_name,
+      phone: data.phone,
+      location: data.location ?? undefined,
+      skills: data.skills,
+      education: data.education ?? undefined,
+      cv_url: data.bio || data.experience_notes ? 'built' : null,
+    }),
+  };
+
+  const { data: row, error } = await supabase
+    .from('candidate_profiles')
+    .update(payload)
+    .eq('id', candidateId)
+    .select()
+    .single();
+  if (error) throw error;
+  return row as unknown as CandidateProfile;
+}
+
+/** Admin / staff upload CV file for any candidate (including walk-ins) */
+export async function uploadCandidateFile(candidateId: string, file: File) {
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'pdf';
+  const allowed = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+  if (!allowed.includes(ext)) throw new Error('Only PDF, DOC, DOCX, JPG, PNG allowed');
+  if (file.size > 5 * 1024 * 1024) throw new Error('File must be under 5 MB');
+
+  const path = `candidates/${candidateId}/${Date.now()}.${ext}`;
+  const { error: upErr } = await supabase.storage
+    .from('candidate-documents')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (upErr) throw upErr;
+
+  await supabase
+    .from('candidate_profiles')
+    .update({ cv_url: path })
+    .eq('id', candidateId);
+
+  await supabase.from('candidate_documents').insert({
+    candidate_id: candidateId,
+    file_name: file.name,
+    file_path: path,
+    file_type: file.type,
+    file_size: file.size,
+    document_type: 'cv',
+    is_primary: true,
+  });
+
+  return path;
 }

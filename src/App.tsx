@@ -18,6 +18,7 @@ import CandidateLayout from './components/layout/CandidateLayout';
 import CandidateHome from './pages/candidate/HomePage';
 import CandidateApplications from './pages/candidate/ApplicationsPage';
 import CandidateProfile from './pages/candidate/ProfilePage';
+import CandidateCv from './pages/candidate/CvPage';
 import CandidateSaved from './pages/candidate/SavedJobsPage';
 import BusinessLayout from './components/layout/BusinessLayout';
 import BusinessHome from './pages/business/BusinessHome';
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="applications" element={<CandidateApplications />} />
           <Route path="saved" element={<CandidateSaved />} />
           <Route path="profile" element={<CandidateProfile />} />
+          <Route path="cv" element={<CandidateCv />} />
         </Route>
 
         {/* Business */}

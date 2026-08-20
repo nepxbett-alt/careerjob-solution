@@ -7,6 +7,8 @@ import { setSeekerStatus } from '../../services/candidateService';
 import { applyToJob, getAllApplications, updateApplicationStatus, rejectApplication } from '../../services/applicationService';
 import { searchJobs, type Job } from '../../services/jobService';
 import { Button } from '../../components/ui/Button';
+import { CvBuilder } from '../../components/CvBuilder';
+import { saveCandidateCvFields, uploadCandidateFile } from '../../services/candidateService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 
 interface Candidate {
@@ -25,6 +27,10 @@ interface Candidate {
   seeker_status: string | null;
   profile_completion: number;
   registration_source: string | null;
+  headline?: string | null;
+  bio?: string | null;
+  experience_notes?: string | null;
+  languages?: string[] | null;
 }
 
 export default function CandidateDetailPage() {
@@ -277,6 +283,67 @@ export default function CandidateDetailPage() {
           </ul>
         )}
       </section>
+
+
+      {/* CV builder for walk-ins and admin edits */}
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm print:border-0">
+        <h2 className="font-semibold text-slate-900 mb-3">Build / edit CV</h2>
+        <div className="mb-4 print:hidden">
+          <label className="cj-label">Upload CV file (PDF/DOC)</label>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            className="text-sm"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (!f || !c) return;
+              try {
+                await uploadCandidateFile(c.id, f);
+                setMsg('CV file uploaded.');
+                load();
+              } catch (err: any) {
+                alert(err.message || 'Upload failed');
+              }
+            }}
+          />
+        </div>
+        <CvBuilder
+          key={c.id + (c.cv_url || '')}
+          title="Candidate CV"
+          showAi
+          initial={{
+            full_name: c.full_name,
+            phone: c.phone,
+            email: c.email || '',
+            location: c.location || 'Pokhara',
+            headline: (c as any).headline || '',
+            bio: c.bio || (c as any).bio || '',
+            education: c.education || '',
+            experience_notes: (c as any).experience_notes || '',
+            skills: (c.skills || []).join(', '),
+            languages: ((c as any).languages || []).join?.(', ') || '',
+            desired_position: c.desired_position || '',
+          }}
+          onSave={async (data) => {
+            await saveCandidateCvFields(c.id, {
+              full_name: data.full_name,
+              phone: data.phone,
+              email: data.email,
+              location: data.location,
+              headline: data.headline,
+              bio: data.bio,
+              education: data.education,
+              skills: (data.skills || '').split(',').map((s) => s.trim()).filter(Boolean),
+              languages: (data.languages || '').split(',').map((s) => s.trim()).filter(Boolean),
+              desired_position: data.desired_position,
+              experience_notes: data.experience_notes,
+            });
+            setMsg('CV saved.');
+            load();
+          }}
+        />
+      </section>
+
     </div>
   );
 }
