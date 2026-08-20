@@ -52,8 +52,18 @@ export async function searchJobs(filters: JobFilters = {}) {
     .order('is_featured', { ascending: false })
     .order('published_at', { ascending: false });
 
-  if (filters.location && filters.location !== 'All Nepal') {
-    query = query.ilike('location', `%${filters.location}%`);
+  // "All Pokhara" / PRIMARY_CITY = entire Pokhara-area inventory.
+  // Migrated jobs often store area names only (Lakeside, New Road) without the word "Pokhara".
+  // Do not require the literal city string in location for the default city view.
+  if (
+    filters.location &&
+    filters.location !== 'All Nepal' &&
+    filters.location !== 'All Pokhara' &&
+    filters.location !== 'Pokhara'
+  ) {
+    query = query.or(
+      `location.ilike.%${filters.location}%,location_detail.ilike.%${filters.location}%`
+    );
   }
   if (filters.q) {
     query = query.or(`title.ilike.%${filters.q}%,description.ilike.%${filters.q}%`);

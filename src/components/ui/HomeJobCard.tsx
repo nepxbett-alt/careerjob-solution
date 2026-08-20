@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { MapPin, Clock, ArrowUpRight, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
+import { formatJobLocation } from '../../lib/formatLocation';
 
 /** Homepage job presentation — featured hero + compact top jobs */
 export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean }) {
-  const locationLabel = job.location_detail
-    ? `${job.location_detail}, Pokhara`
-    : 'Pokhara';
+  const locationLabel =
+    formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' }) || 'Pokhara';
   const isTop = featured || !!job.is_featured;
 
   if (isTop && featured) {

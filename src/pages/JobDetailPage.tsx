@@ -1,3 +1,4 @@
+import { formatJobLocation } from '../lib/formatLocation';
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, ArrowLeft, Bookmark, BookmarkCheck } from 'lucide-react';
@@ -102,7 +103,7 @@ export default function JobDetailPage() {
   }
 
   const whatsappMsg = `Hello CareerJob, I am interested in the ${job.title} position in ${job.location}.`;
-  const locationLabel = job.location_detail ? `${job.location_detail}, ${job.location}` : job.location;
+  const locationLabel = formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' }) || job.location;
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://careerjobsolution.com.np';
   const canonical = `${origin}/jobs/${job.id}`;
@@ -166,30 +167,52 @@ export default function JobDetailPage() {
         </div>
       </header>
 
-      {job.description && (
-        <section className="mb-8">
-          <h2 className="font-semibold text-lg text-slate-900 mb-2">About this role</h2>
-          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.description}</div>
-        </section>
-      )}
-      {job.responsibilities && (
-        <section className="mb-8">
-          <h2 className="font-semibold text-lg text-slate-900 mb-2">Responsibilities</h2>
-          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.responsibilities}</div>
-        </section>
-      )}
-      {job.requirements && (
-        <section className="mb-8">
-          <h2 className="font-semibold text-lg text-slate-900 mb-2">Requirements</h2>
-          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.requirements}</div>
-        </section>
-      )}
-      {job.benefits && (
-        <section className="mb-8">
-          <h2 className="font-semibold text-lg text-slate-900 mb-2">Benefits</h2>
-          <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.benefits}</div>
-        </section>
-      )}
+      {(() => {
+        const meaningful = (v: string | null | undefined) => {
+          if (!v) return false;
+          const s = String(v).trim();
+          if (!s || s === '[]' || s === '{}') return false;
+          return true;
+        };
+        const hasDesc = meaningful(job.description);
+        const hasReq = meaningful(job.requirements);
+        const hasResp = meaningful(job.responsibilities);
+        const hasBen = meaningful(job.benefits);
+        const any = hasDesc || hasReq || hasResp || hasBen;
+        return (
+          <>
+            {hasDesc && (
+              <section className="mb-8">
+                <h2 className="font-semibold text-lg text-slate-900 mb-2">About this role</h2>
+                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.description}</div>
+              </section>
+            )}
+            {hasResp && (
+              <section className="mb-8">
+                <h2 className="font-semibold text-lg text-slate-900 mb-2">Responsibilities</h2>
+                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.responsibilities}</div>
+              </section>
+            )}
+            {hasReq && (
+              <section className="mb-8">
+                <h2 className="font-semibold text-lg text-slate-900 mb-2">Requirements</h2>
+                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.requirements}</div>
+              </section>
+            )}
+            {hasBen && (
+              <section className="mb-8">
+                <h2 className="font-semibold text-lg text-slate-900 mb-2">Benefits</h2>
+                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.benefits}</div>
+              </section>
+            )}
+            {!any && (
+              <p className="text-sm text-slate-500 mb-6 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                Additional role details were not provided by the employer. CareerJob can share more information during the recruitment process.
+              </p>
+            )}
+          </>
+        );
+      })()}
 
       <p className="text-xs text-slate-400 mb-8 leading-relaxed">
         Employer details and exact interview information may be provided by CareerJob during the recruitment process.

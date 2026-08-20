@@ -6,7 +6,6 @@
  * Never returns internal IDs or private data.
  *
  * Deploy: supabase functions deploy public-job-application --no-verify-jwt
- * Secrets: SUPABASE_SERVICE_ROLE_KEY (auto), optional GEMINI not needed.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 
@@ -24,7 +23,7 @@ function json(body: unknown, status = 200) {
 }
 
 function normalizePhone(raw: string): string {
-  let p = raw.replace(/[\s\-()]/g, '');
+  let p = String(raw || '').replace(/[\s\-()]/g, '');
   if (p.startsWith('+977')) p = p.slice(4);
   if (p.startsWith('977') && p.length > 10) p = p.slice(3);
   if (p.startsWith('0')) p = p.slice(1);
@@ -51,9 +50,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || Deno.env.get('SUPABASE_PROJECT_URL');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!supabaseUrl || !serviceKey) {
+      console.error('missing env', { hasUrl: !!supabaseUrl, hasKey: !!serviceKey });
       return json({ success: false, error: 'Server configuration error' }, 500);
     }
 
@@ -66,17 +66,21 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Invalid request body' }, 400);
     }
 
-    const jobId = String(body.job_id || '').trim();
-    const fullName = String(body.full_name || '').trim();
-    const phoneRaw = String(body.phone || '').trim();
-    const email = body.email ? String(body.email).trim().toLowerCase() : null;
-    const location = body.location ? String(body.location).trim() : 'Pokhara';
-    const education = body.education ? String(body.education).trim() : null;
-    const experience = body.experience ? String(body.experience).trim() : null;
-    const message = body.message ? String(body.message).trim().slice(0, 2000) : null;
+    const b = body as Record<string, unknown>;
+    const jobId = String(b.job_id || '').trim();
+    const fullName = String(b.full_name || '').trim();
+    const phoneRaw = String(b.phone || '').trim();
+    const email = b.email ? String(b.email).trim().toLowerCase() : null;
+    const location = b.location ? String(b.location).trim() : 'Pokhara';
+    const education = b.education ? String(b.education).trim() : null;
+    const experience = b.experience ? String(b.experience).trim() : null;
+    const message = b.message ? String(b.message).trim().slice(0, 2000) : null;
 
-    if (!jobId || !fullName || fullName.length < 2) {
-      return json({ success: false, error: 'Full name and job are required.' }, 400);
+    if (!jobId) {
+      return json({ success: false, error: 'Job is required.' }, 400);
+    }
+    if (!fullName || fullName.length < 2) {
+      return json({ success: false, error: 'Full name is required.' }, 400);
     }
     if (fullName.length > 120) {
       return json({ success: false, error: 'Name is too long.' }, 400);
@@ -86,7 +90,7 @@ Deno.serve(async (req) => {
     if (!isValidNepalPhone(phone)) {
       return json(
         { success: false, error: 'Please enter a valid Nepal mobile number (e.g. 98XXXXXXXX).' },
-        400
+        400,
       );
     }
 
@@ -94,14 +98,17 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Please enter a valid email address.' }, 400);
     }
 
-    // Validate job is public & open
     const { data: job, error: jobErr } = await admin
       .from('jobs')
       .select('id, title, status, approved_by_agency, application_deadline')
       .eq('id', jobId)
       .maybeSingle();
 
-    if (jobErr || !job) {
+    if (jobErr) {
+      console.error('job lookup error', jobErr);
+      return json({ success: false, error: 'Could not verify job. Please try again.' }, 500);
+    }
+    if (!job) {
       return json({ success: false, error: 'Job not found.' }, 404);
     }
     if (job.status !== 'published' || !job.approved_by_agency) {
@@ -114,49 +121,53 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Rate limit: same phone + job within 24h
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recentApps } = await admin
-      .from('applications')
-      .select('id, candidate_profiles!inner(phone)')
-      .eq('job_id', jobId)
-      .gte('applied_at', since)
-      .limit(5);
-
-    const phoneHit = (recentApps || []).some(
-      (a: any) => normalizePhone(a.candidate_profiles?.phone || '') === phone
-    );
-    if (phoneHit) {
-      return json({
-        success: false,
-        error: 'You have already applied to this job recently. CareerJob will contact you if needed.',
-      }, 429);
-    }
-
-    // Find existing candidate by phone (safe association)
     let candidateId: string | null = null;
-    const { data: existingByPhone } = await admin
+    const { data: byPhoneRows, error: phoneErr } = await admin
       .from('candidate_profiles')
-      .select('id, full_name, phone')
+      .select('id, phone')
       .eq('phone', phone)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
-    if (existingByPhone) {
-      candidateId = existingByPhone.id;
+    if (phoneErr) {
+      console.error('phone lookup error', phoneErr);
+      return json({ success: false, error: 'Could not process application. Please try again.' }, 500);
+    }
+
+    if (byPhoneRows && byPhoneRows.length > 0) {
+      candidateId = byPhoneRows[0].id;
     } else if (email) {
-      const { data: existingByEmail } = await admin
+      const { data: byEmailRows } = await admin
         .from('candidate_profiles')
         .select('id')
         .eq('email', email)
-        .limit(1)
-        .maybeSingle();
-      if (existingByEmail) candidateId = existingByEmail.id;
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (byEmailRows && byEmailRows.length > 0) {
+        candidateId = byEmailRows[0].id;
+      }
+    }
+
+    if (candidateId) {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: recent } = await admin
+        .from('applications')
+        .select('id, application_reference')
+        .eq('job_id', jobId)
+        .eq('candidate_id', candidateId)
+        .gte('applied_at', since)
+        .limit(1);
+
+      if (recent && recent.length > 0) {
+        return json({
+          success: true,
+          application_reference: recent[0].application_reference || 'CJ-EXISTING',
+          message: 'You have already applied to this job recently. CareerJob will contact you if needed.',
+        });
+      }
     }
 
     if (!candidateId) {
-      // Create new candidate (anonymous — no user_id)
       const { data: created, error: createErr } = await admin
         .from('candidate_profiles')
         .insert({
@@ -178,34 +189,33 @@ Deno.serve(async (req) => {
 
       if (createErr || !created) {
         console.error('candidate create error', createErr);
-        return json({ success: false, error: 'Could not save your application. Please try again or contact CareerJob.' }, 500);
+        return json(
+          { success: false, error: 'Could not save your application. Please try again or contact CareerJob.' },
+          500,
+        );
       }
       candidateId = created.id;
     } else {
-      // Light update of optional fields if empty
-      await admin
-        .from('candidate_profiles')
-        .update({
-          ...(email ? { email } : {}),
-          ...(location ? { location } : {}),
-          ...(education ? { education } : {}),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', candidateId);
+      const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (email) patch.email = email;
+      if (location) patch.location = location;
+      if (education) patch.education = education;
+      if (experience) patch.experience_notes = experience;
+      if (fullName) patch.full_name = fullName;
+      await admin.from('candidate_profiles').update(patch).eq('id', candidateId);
     }
 
-    // Prevent duplicate application for same job+candidate
-    const { data: existingApp } = await admin
+    const { data: existingAppRows } = await admin
       .from('applications')
       .select('id, application_reference')
       .eq('job_id', jobId)
       .eq('candidate_id', candidateId)
-      .maybeSingle();
+      .limit(1);
 
-    if (existingApp) {
+    if (existingAppRows && existingAppRows.length > 0) {
       return json({
         success: true,
-        application_reference: existingApp.application_reference || 'CJ-EXISTING',
+        application_reference: existingAppRows[0].application_reference || 'CJ-EXISTING',
         message: 'You have already applied to this job. CareerJob has your details.',
       });
     }
@@ -230,16 +240,18 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Could not create application. Please try again.' }, 500);
     }
 
-    // History
-    await admin.from('application_status_history').insert({
-      application_id: app.id,
-      from_status: null,
-      to_status: 'applied',
-      note: 'Public application submitted (no login)',
-      changed_by: null,
-    }).catch(() => {});
+    try {
+      await admin.from('application_status_history').insert({
+        application_id: app.id,
+        from_status: null,
+        to_status: 'applied',
+        notes: 'Public application submitted (no login)',
+        changed_by: null,
+      });
+    } catch (histErr) {
+      console.error('history insert non-fatal', histErr);
+    }
 
-    // Notify staff (best-effort)
     try {
       const { data: staff } = await admin
         .from('profiles')
@@ -259,17 +271,19 @@ Deno.serve(async (req) => {
         }));
         await admin.from('notifications').insert(rows);
       }
-    } catch {
-      // non-fatal
+    } catch (nErr) {
+      console.error('notify non-fatal', nErr);
     }
 
     return json({
       success: true,
       application_reference: reference,
-      message: 'Your application has been received. CareerJob will review it and contact you if appropriate.',
+      message:
+        'Your application has been received. CareerJob will review it and contact you if appropriate.',
     });
   } catch (e) {
-    console.error('public-job-application error', e);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('public-job-application error', msg, e);
     return json({ success: false, error: 'Something went wrong. Please try again later.' }, 500);
   }
 });

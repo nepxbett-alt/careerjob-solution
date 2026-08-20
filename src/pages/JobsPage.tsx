@@ -8,7 +8,7 @@ import { JobCard } from '../components/ui/JobCard';
 import { JobCardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Seo } from '../components/Seo';
-import { POKHARA_AREAS, JOB_TYPES, PRIMARY_CITY } from '../lib/config';
+import { POKHARA_AREAS, JOB_TYPES } from '../lib/config';
 import { cn } from '../lib/cn';
 
 export default function JobsPage() {
@@ -27,25 +27,18 @@ export default function JobsPage() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    // Always Pokhara-focused
+    // Pokhara-area agency inventory: do not require literal "Pokhara" in location strings.
+    // Area chips filter by area name; "All Pokhara" returns the full published set.
     searchJobs({
       q: q || undefined,
-      location: PRIMARY_CITY,
+      location: area && area !== 'All Pokhara' ? area : undefined,
       job_type: jobType || undefined,
       page,
+      limit: 24,
     })
       .then(({ jobs, total }) => {
-        let list = jobs;
-        // Optional area filter on location_detail client-side (or expand API later)
-        if (area && area !== 'All Pokhara') {
-          list = jobs.filter(
-            (j) =>
-              (j.location_detail || '').toLowerCase().includes(area.toLowerCase()) ||
-              j.location.toLowerCase().includes(area.toLowerCase())
-          );
-        }
-        setJobs(list);
-        setTotal(area && area !== 'All Pokhara' ? list.length : total);
+        setJobs(jobs);
+        setTotal(total);
       })
       .catch(() => setError("We couldn't load jobs. Please try again."))
       .finally(() => setLoading(false));

@@ -2,9 +2,10 @@ import { Link } from 'react-router-dom';
 import { MapPin, Clock, Star, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
+import { formatJobLocation } from '../../lib/formatLocation';
 
 export function JobCard({ job }: { job: Job }) {
-  const area = job.location_detail || null;
+  const locationLabel = formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' });
   const featured = !!job.is_featured;
 
   return (
@@ -40,7 +41,7 @@ export function JobCard({ job }: { job: Job }) {
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-[13px] text-[#3D4A5C]">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-[#98A2B3] shrink-0" aria-hidden />
-            {area ? `${area}, Pokhara` : 'Pokhara'}
+            {locationLabel || 'Pokhara'}
           </span>
           {job.published_at && (
             <span className="inline-flex items-center gap-1.5 text-[#6B7789]">
