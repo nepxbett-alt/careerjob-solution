@@ -26,7 +26,7 @@ export async function getMyCandidateProfile(userId: string) {
     .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
-  return data as CandidateProfile | null;
+  return data as unknown as CandidateProfile | null;
 }
 
 export async function upsertCandidateProfile(
@@ -44,7 +44,7 @@ export async function upsertCandidateProfile(
       .select()
       .single();
     if (error) throw error;
-    return data as CandidateProfile;
+    return data as unknown as CandidateProfile;
   }
 
   const { data, error } = await supabase
@@ -64,7 +64,7 @@ export async function upsertCandidateProfile(
     .select()
     .single();
   if (error) throw error;
-  return data as CandidateProfile;
+  return data as unknown as CandidateProfile;
 }
 
 function calcCompletion(p: Partial<CandidateProfile>): number {

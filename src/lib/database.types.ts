@@ -1,3 +1,7 @@
+/**
+ * Supabase schema types for CareerJob Solution.
+ * Practical subset aligned with migrations — extend as needed.
+ */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type UserRole =
@@ -21,7 +25,8 @@ export type ApplicationStatus =
   | 'withdrawn'
   | 'closed';
 
-export type JobStatus = 'draft' | 'pending_review' | 'published' | 'paused' | 'closed' | 'filled';
+/** Loose row shape used where full generated types are not available */
+export type DbRow = Record<string, unknown>;
 
 export interface Database {
   public: {
@@ -34,8 +39,8 @@ export interface Database {
           phone: string | null;
           email: string | null;
           avatar_url: string | null;
-          created_at: string;
-          updated_at: string;
+          created_at?: string;
+          updated_at?: string;
         };
         Insert: {
           id: string;
@@ -74,14 +79,15 @@ export interface Database {
           application_deadline: string | null;
           status: string;
           public_employer_label: string | null;
+          is_featured: boolean | null;
           approved_by_agency: boolean;
           category_id: string | null;
           organization_id: string | null;
           created_at: string;
           published_at: string | null;
         };
-        Insert: Record<string, unknown>;
-        Update: Record<string, unknown>;
+        Insert: DbRow;
+        Update: DbRow;
         Relationships: [];
       };
       applications: {
@@ -94,16 +100,14 @@ export interface Database {
           applied_at: string;
           updated_at: string;
         };
-        Insert: {
-          job_id: string;
-          candidate_id: string;
-          status?: ApplicationStatus;
-          cover_message?: string | null;
-        };
-        Update: {
-          status?: ApplicationStatus;
-          cover_message?: string | null;
-        };
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      application_status_history: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
         Relationships: [];
       };
       candidate_profiles: {
@@ -120,9 +124,56 @@ export interface Database {
           education: string | null;
           is_verified: boolean;
           created_at: string;
+          headline?: string | null;
+          bio?: string | null;
+          experience_years?: number | null;
+          languages?: string[] | null;
+          photo_url?: string | null;
         };
-        Insert: Record<string, unknown>;
-        Update: Record<string, unknown>;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      candidate_documents: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      organizations: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      organization_members: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      business_requests: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      saved_jobs: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      interviews: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      placements: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
         Relationships: [];
       };
       notifications: {
@@ -137,35 +188,32 @@ export interface Database {
           entity_id: string | null;
           created_at: string;
         };
-        Insert: {
-          user_id: string;
-          title: string;
-          body?: string | null;
-          type?: string;
-          entity_type?: string | null;
-          entity_id?: string | null;
-        };
-        Update: { is_read?: boolean };
+        Insert: DbRow;
+        Update: DbRow;
         Relationships: [];
       };
-      application_status_history: {
-        Row: {
-          id: string;
-          application_id: string;
-          from_status: string | null;
-          to_status: string;
-          changed_by: string | null;
-          notes: string | null;
-          created_at: string;
-        };
-        Insert: {
-          application_id: string;
-          from_status?: string | null;
-          to_status: string;
-          changed_by?: string | null;
-          notes?: string | null;
-        };
-        Update: Record<string, never>;
+      transactions: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      audit_logs: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      job_categories: {
+        Row: { id: string; name: string; slug: string };
+        Insert: DbRow;
+        Update: DbRow;
+        Relationships: [];
+      };
+      agency_settings: {
+        Row: DbRow;
+        Insert: DbRow;
+        Update: DbRow;
         Relationships: [];
       };
     };
@@ -185,5 +233,6 @@ export interface Database {
       };
     };
     Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }

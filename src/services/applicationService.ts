@@ -60,7 +60,7 @@ export async function getMyApplications(candidateId: string) {
     .eq('candidate_id', candidateId)
     .order('applied_at', { ascending: false });
   if (error) throw error;
-  return (data || []) as Application[];
+  return (data || []) as unknown as Application[];
 }
 
 export async function getAllApplications(filters?: { status?: string }) {
@@ -69,11 +69,11 @@ export async function getAllApplications(filters?: { status?: string }) {
     .select('*, jobs(title, location), candidate_profiles(full_name, phone, location, cv_url, user_id)')
     .order('applied_at', { ascending: false });
 
-  if (filters?.status) q = q.eq('status', filters.status);
+  if (filters?.status) q = q.eq('status', filters.status as never);
 
   const { data, error } = await q;
   if (error) throw error;
-  return (data || []) as Application[];
+  return (data || []) as unknown as Application[];
 }
 
 export async function updateApplicationStatus(
@@ -83,7 +83,7 @@ export async function updateApplicationStatus(
 ) {
   const { data, error } = await supabase
     .from('applications')
-    .update({ status: newStatus })
+    .update({ status: newStatus } as never)
     .eq('id', applicationId)
     .select('*, candidate_profiles(user_id)')
     .single();

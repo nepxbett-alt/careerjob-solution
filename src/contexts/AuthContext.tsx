@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const metaRole = authUser.user_metadata.role as string | undefined;
       const metaName = authUser.user_metadata.full_name as string | undefined;
       const metaPhone = authUser.user_metadata.phone as string | undefined;
-      const updates: Record<string, string> = {};
+      const updates: { role?: Role; full_name?: string; phone?: string } = {};
 
       if (metaRole && VALID_ROLES.includes(metaRole as Role) && p.role === 'candidate' && metaRole !== 'candidate') {
         // only elevate from default candidate → business (never auto-elevate to admin)

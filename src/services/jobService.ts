@@ -68,7 +68,7 @@ export async function searchJobs(filters: JobFilters = {}) {
   const { data, error, count } = await query.range(from, to);
 
   if (error) throw error;
-  return { jobs: (data || []) as Job[], total: count || 0, page, limit };
+  return { jobs: (data || []) as unknown as Job[], total: count || 0, page, limit };
 }
 
 /** Top jobs for homepage — admin-flagged featured first, then latest */
@@ -84,7 +84,7 @@ export async function getFeaturedJobs(limit = 6) {
 
   if (fErr) throw fErr;
 
-  const featuredList = (featured || []) as Job[];
+  const featuredList = (featured || []) as unknown as Job[];
   if (featuredList.length >= limit) {
     return featuredList.slice(0, limit);
   }
@@ -106,7 +106,7 @@ export async function getFeaturedJobs(limit = 6) {
 
   const { data: rest, error } = await q;
   if (error) throw error;
-  return [...featuredList, ...((rest || []) as Job[])];
+  return [...featuredList, ...((rest || []) as unknown as Job[])];
 }
 
 export async function getJobById(id: string) {
@@ -119,13 +119,13 @@ export async function getJobById(id: string) {
     .single();
 
   if (error) throw error;
-  return data as Job;
+  return data as unknown as Job;
 }
 
 export async function setJobFeatured(jobId: string, featured: boolean) {
   const { data, error } = await supabase
     .from('jobs')
-    .update({ is_featured: featured } as never)
+    .update({ is_featured: featured })
     .eq('id', jobId)
     .select('id, is_featured')
     .single();
