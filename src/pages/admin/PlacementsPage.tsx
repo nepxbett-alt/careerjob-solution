@@ -5,10 +5,12 @@ import {
   markDay30Complete,
   setCommissionStatus,
   placementDayProgress,
+  markCandidateAvailable,
   type Placement,
 } from '../../services/placementService';
 import { getAllApplications, type Application } from '../../services/applicationService';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -289,6 +291,18 @@ export default function PlacementsPage() {
                 <span className="text-xs text-slate-400 self-center">
                   Commission: {p.commission_status || 'pending'}
                 </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={async () => {
+                    if (!confirm('Candidate left the job? Mark them Available again as an active job seeker.')) return;
+                    await markCandidateAvailable(p.candidate_id);
+                    await supabase.from('placements').update({ status: 'left' }).eq('id', p.id);
+                    load();
+                  }}
+                >
+                  Available again
+                </Button>
               </div>
             </article>
           );

@@ -122,3 +122,65 @@ export async function getSignedCVUrl(path: string) {
   if (error) throw error;
   return data.signedUrl;
 }
+
+export type SeekerStatus = 'active' | 'passive' | 'employed' | 'inactive';
+
+export async function createWalkInCandidate(params: {
+  full_name: string;
+  phone: string;
+  email?: string;
+  location?: string;
+  education?: string;
+  experience_years?: number;
+  skills?: string[];
+  desired_position?: string;
+  expected_salary?: number;
+  availability?: string;
+  registeredBy?: string;
+  notes?: string;
+}) {
+  const completion = calcCompletion({
+    full_name: params.full_name,
+    phone: params.phone,
+    location: params.location,
+    education: params.education,
+    skills: params.skills,
+  });
+
+  const { data, error } = await supabase
+    .from('candidate_profiles')
+    .insert({
+      user_id: null,
+      full_name: params.full_name.trim(),
+      phone: params.phone.trim(),
+      email: params.email?.trim() || null,
+      location: params.location || 'Pokhara',
+      education: params.education || null,
+      experience_years: params.experience_years ?? null,
+      skills: params.skills || [],
+      desired_position: params.desired_position || null,
+      expected_salary: params.expected_salary ?? null,
+      availability: params.availability || null,
+      headline: params.desired_position || null,
+      seeker_status: 'active',
+      registration_source: 'walk_in',
+      registered_by: params.registeredBy || null,
+      profile_completion: completion,
+      is_verified: false,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as unknown as CandidateProfile;
+}
+
+export async function setSeekerStatus(candidateId: string, status: SeekerStatus) {
+  const { data, error } = await supabase
+    .from('candidate_profiles')
+    .update({ seeker_status: status })
+    .eq('id', candidateId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}

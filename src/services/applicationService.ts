@@ -124,3 +124,47 @@ export async function updateApplicationStatus(
 
   return data;
 }
+
+export const REJECT_REASONS = [
+  { value: 'experience', label: 'Experience' },
+  { value: 'skills', label: 'Skills' },
+  { value: 'salary', label: 'Salary' },
+  { value: 'interview', label: 'Interview' },
+  { value: 'position_filled', label: 'Position filled' },
+  { value: 'other', label: 'Other' },
+] as const;
+
+export async function rejectApplication(applicationId: string, reason: string, notes?: string) {
+  const note = notes ? `${reason}: ${notes}` : reason;
+  const { data, error } = await supabase
+    .from('applications')
+    .update({ status: 'rejected', reject_reason: reason })
+    .eq('id', applicationId)
+    .select('*, candidate_profiles(user_id)')
+    .single();
+  if (error) throw error;
+
+  await supabase.from('application_status_history').insert({
+    application_id: applicationId,
+    to_status: 'rejected',
+    notes: note,
+  });
+
+  try {
+    const userId = (data as any)?.candidate_profiles?.user_id;
+    if (userId) {
+      await createNotification({
+        userId,
+        title: 'Application update from CareerJob',
+        body: 'Your application was not selected this time. You remain an active job seeker — we will match other roles.',
+        type: 'application',
+        entityType: 'application',
+        entityId: applicationId,
+      });
+    }
+  } catch {
+    /* non-blocking */
+  }
+  return data;
+}
+

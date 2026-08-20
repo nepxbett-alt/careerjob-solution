@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Phone, Search } from 'lucide-react';
-import { getAllApplications, updateApplicationStatus, type Application } from '../../services/applicationService';
+import { getAllApplications, updateApplicationStatus, rejectApplication, REJECT_REASONS, type Application } from '../../services/applicationService';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -51,6 +51,30 @@ export default function ApplicationsPage() {
   }, [filter]);
 
   const changeStatus = async (id: string, status: string) => {
+    if (status === 'rejected') {
+      const reasonLabels = REJECT_REASONS.map((r, i) => `${i + 1}. ${r.label}`).join('\n');
+      const pick = prompt(
+        `Reject reason (enter number):\n${reasonLabels}\n\nOr type: experience, skills, salary, interview, position_filled, other`
+      );
+      if (pick == null) return;
+      const byNum = REJECT_REASONS[parseInt(pick, 10) - 1];
+      const reason =
+        byNum?.value ||
+        REJECT_REASONS.find((r) => r.value === pick.trim().toLowerCase() || r.label.toLowerCase() === pick.trim().toLowerCase())?.value ||
+        'other';
+      const notes = prompt('Optional note for reject (or leave empty):') || undefined;
+      setBusy(id);
+      try {
+        await rejectApplication(id, reason, notes);
+        await load();
+      } catch {
+        alert("Couldn't reject. Try again.");
+      } finally {
+        setBusy(null);
+      }
+      return;
+    }
+
     const label = status.replace(/_/g, ' ');
     if (!confirm(`Move this application to “${label}”?`)) return;
     setBusy(id);
