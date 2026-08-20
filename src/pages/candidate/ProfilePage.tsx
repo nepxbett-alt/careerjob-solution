@@ -159,7 +159,7 @@ export default function ProfilePage() {
         <div>
           <label htmlFor="pf-loc" className="cj-label">Location</label>
           <select id="pf-loc" value={location} onChange={(e) => setLocation(e.target.value)} className="cj-input">
-            {LOCATIONS.filter((l) => l !== 'All Nepal').map((l) => (
+            {LOCATIONS.filter((l) => l !== 'All Pokhara').map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}
           </select>

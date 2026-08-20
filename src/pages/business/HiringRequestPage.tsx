@@ -105,7 +105,7 @@ export default function HiringRequestPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Location *</label>
           <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full h-11 px-3 border rounded-lg bg-white">
-            {LOCATIONS.filter((l) => l !== 'All Nepal').map((l) => (
+            {LOCATIONS.filter((l) => l !== 'All Pokhara').map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}
           </select>

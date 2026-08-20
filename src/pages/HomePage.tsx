@@ -3,7 +3,7 @@ import { Search, Briefcase, Users, ArrowRight, Shield, MessageCircle, CheckCircl
 import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-import { BRAND, CONTACT } from '../lib/config';
+import { CONTACT } from '../lib/config';
 import { getFeaturedJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { HomeJobCard } from '../components/ui/HomeJobCard';
