@@ -58,7 +58,7 @@ export default function HomePage() {
               Find your next opportunity
             </h1>
             <p className="text-[0.95rem] md:text-base text-[#6B7789] mb-8 leading-relaxed max-w-md mx-auto">
-              Browse jobs in Pokhara, build your profile once, and apply with confidence.
+              Browse verified jobs in Pokhara. Apply in about one minute — no account required.
             </p>
 
             <form onSubmit={handleSearch} className="mb-6" role="search">
@@ -228,7 +228,7 @@ export default function HomePage() {
             <div className="rounded-2xl border border-[#E8ECF1] p-5">
               <h3 className="font-semibold text-[#0B1220] mb-3">For job seekers</h3>
               <ol className="space-y-2.5 text-sm text-[#3D4A5C]">
-                {['Search jobs in Pokhara', 'Create profile & upload CV', 'Apply in one step', 'We review and support you'].map((t, i) => (
+                {['Search jobs in Pokhara', 'Apply without creating an account', 'We review your application', 'Get matched & hired'].map((t, i) => (
                   <li key={t} className="flex gap-2.5">
                     <span className="text-[#0066FF] font-semibold tabular-nums">{i + 1}.</span>
                     {t}

@@ -12,6 +12,7 @@ import { isJobSaved, saveJob, unsaveJob } from '../services/savedJobService';
 import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Seo } from '../components/Seo';
+import { PublicApplyForm } from '../components/PublicApplyForm';
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,7 @@ export default function JobDetailPage() {
   const [saved, setSaved] = useState(false);
   const [candProfile, setCandProfile] = useState<CandidateProfile | null>(null);
   const [saveBusy, setSaveBusy] = useState(false);
+  const [showApply, setShowApply] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -45,8 +47,12 @@ export default function JobDetailPage() {
   }, [id, user]);
 
   const handleApply = () => {
-    if (!user) navigate('/login?redirect=/jobs/' + id);
-    else navigate('/candidate/applications?apply=' + id);
+    // Public apply — no login required
+    setShowApply(true);
+    // Scroll form into view on mobile after paint
+    setTimeout(() => {
+      document.getElementById('public-apply-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
   const handleSave = async () => {
@@ -220,31 +226,47 @@ export default function JobDetailPage() {
             </div>
           );
         })()}
-        <Button size="lg" onClick={handleApply}>Apply for this job</Button>
-        <Button size="lg" variant="outline" onClick={handleSave} loading={saveBusy} aria-pressed={saved}>
-          {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
-          {saved ? 'Saved' : 'Save job'}
-        </Button>
-        <WhatsAppButton message={whatsappMsg} label="Ask CareerJob" />
+        {!showApply && (
+          <>
+            <Button size="lg" onClick={handleApply}>Apply for this job</Button>
+            <Button size="lg" variant="outline" onClick={handleSave} loading={saveBusy} aria-pressed={saved}>
+              {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
+              {saved ? 'Saved' : 'Save job'}
+            </Button>
+            <WhatsAppButton message={whatsappMsg} label="Ask CareerJob" />
+          </>
+        )}
       </div>
 
-      {/* Mobile sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom md:hidden z-30">
-        <div className="flex gap-2 max-w-lg mx-auto">
-          <Button
-            variant="outline"
-            className="shrink-0 min-w-[48px] px-3"
-            onClick={handleSave}
-            loading={saveBusy}
-            aria-label={saved ? 'Unsave job' : 'Save job'}
-          >
-            {saved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
-          </Button>
-          <Button fullWidth size="lg" onClick={handleApply}>
-            Apply for this job
-          </Button>
+      {showApply && (
+        <div id="public-apply-form" className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+          <PublicApplyForm
+            jobId={job.id}
+            jobTitle={job.title}
+            onClose={() => setShowApply(false)}
+          />
         </div>
-      </div>
+      )}
+
+      {/* Mobile sticky CTA — hidden while applying */}
+      {!showApply && (
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom md:hidden z-30">
+          <div className="flex gap-2 max-w-lg mx-auto">
+            <Button
+              variant="outline"
+              className="shrink-0 min-w-[48px] px-3"
+              onClick={handleSave}
+              loading={saveBusy}
+              aria-label={saved ? 'Unsave job' : 'Save job'}
+            >
+              {saved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
+            </Button>
+            <Button fullWidth size="lg" onClick={handleApply}>
+              Apply for this job
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
