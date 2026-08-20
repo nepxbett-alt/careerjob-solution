@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyCandidateProfile, upsertCandidateProfile, uploadCV, type CandidateProfile } from '../../services/candidateService';
 import { Button } from '../../components/ui/Button';
+import { AiAssistPanel } from '../../components/AiAssistPanel';
 import { LOCATIONS } from '../../lib/config';
 
 export default function ProfilePage() {
@@ -19,6 +20,9 @@ export default function ProfilePage() {
   const [location, setLocation] = useState('Pokhara');
   const [education, setEducation] = useState('');
   const [skills, setSkills] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [bio, setBio] = useState('');
+  const [experienceNotes, setExperienceNotes] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -31,6 +35,8 @@ export default function ProfilePage() {
           setLocation(p.location || 'Pokhara');
           setEducation(p.education || '');
           setSkills((p.skills || []).join(', '));
+          setHeadline(p.headline || '');
+          setBio(p.bio || '');
         } else if (authProfile) {
           setFullName(authProfile.full_name || '');
           setPhone(authProfile.phone || '');
@@ -61,6 +67,8 @@ export default function ProfilePage() {
         location,
         education: education.trim() || null,
         skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
+        headline: headline.trim() || null,
+        bio: bio.trim() || null,
         email: user.email || null,
       });
       await refreshProfile();
@@ -168,9 +176,90 @@ export default function ProfilePage() {
           <label htmlFor="pf-edu" className="cj-label">Education <span className="text-slate-400 font-normal">(optional)</span></label>
           <input id="pf-edu" value={education} onChange={(e) => setEducation(e.target.value)} className="cj-input" placeholder="e.g. +2, Bachelor" />
         </div>
+
         <div>
-          <label htmlFor="pf-skills" className="cj-label">Skills <span className="text-slate-400 font-normal">(comma separated)</span></label>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <label htmlFor="pf-headline" className="cj-label mb-0">Professional headline</label>
+          </div>
+          <input id="pf-headline" value={headline} onChange={(e) => setHeadline(e.target.value)} className="cj-input" placeholder="e.g. Hospitality professional · 2 years" />
+        </div>
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <label htmlFor="pf-bio" className="cj-label mb-0">Professional summary</label>
+            <AiAssistPanel
+              task="cv_summary"
+              label="Generate summary"
+              buildInput={() =>
+                [
+                  fullName && `Name: ${fullName}`,
+                  location && `Location: ${location}`,
+                  education && `Education: ${education}`,
+                  skills && `Skills: ${skills}`,
+                  experienceNotes && `Experience: ${experienceNotes}`,
+                  headline && `Headline: ${headline}`,
+                  bio && `Current summary: ${bio}`,
+                ]
+                  .filter(Boolean)
+                  .join('\n')
+              }
+              onAccept={(result) => setBio(result)}
+            />
+          </div>
+          <textarea
+            id="pf-bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="cj-input min-h-[100px] py-2.5"
+            placeholder="Short summary of your background…"
+            rows={4}
+          />
+        </div>
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <label htmlFor="pf-exp" className="cj-label mb-0">Work experience notes</label>
+            <AiAssistPanel
+              task="improve_experience"
+              label="Improve with AI"
+              buildInput={() => experienceNotes}
+              onAccept={(result) => setExperienceNotes(result)}
+            />
+          </div>
+          <textarea
+            id="pf-exp"
+            value={experienceNotes}
+            onChange={(e) => setExperienceNotes(e.target.value)}
+            className="cj-input min-h-[88px] py-2.5"
+            placeholder="e.g. Waiter at hotel. Took orders and served customers."
+            rows={3}
+          />
+          <p className="text-xs text-slate-400 mt-1">Facts only — AI rewrites wording, does not invent achievements.</p>
+        </div>
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <label htmlFor="pf-skills" className="cj-label mb-0">Skills</label>
+            <AiAssistPanel
+              task="improve_cv"
+              label="Improve CV text"
+              buildInput={() =>
+                [
+                  headline && `Headline: ${headline}`,
+                  bio && `Summary: ${bio}`,
+                  education && `Education: ${education}`,
+                  skills && `Skills: ${skills}`,
+                  experienceNotes && `Experience: ${experienceNotes}`,
+                ]
+                  .filter(Boolean)
+                  .join('\n')
+              }
+              onAccept={(result) => {
+                // Prefer putting polished text into bio if multi-line, else skills
+                if (result.includes('\n') || result.length > 80) setBio(result);
+                else setSkills(result);
+              }}
+            />
+          </div>
           <input id="pf-skills" value={skills} onChange={(e) => setSkills(e.target.value)} className="cj-input" placeholder="Waiter, Customer service" />
+          <p className="text-xs text-slate-400 mt-1">Comma-separated skills</p>
         </div>
 
         <div>

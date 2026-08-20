@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { submitHiringRequest } from '../../services/businessService';
 import { Button } from '../../components/ui/Button';
+import { AiAssistPanel } from '../../components/AiAssistPanel';
 import { LOCATIONS } from '../../lib/config';
 
 export default function HiringRequestPage() {
@@ -133,6 +134,27 @@ export default function HiringRequestPage() {
           <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="w-full h-11 px-3 border rounded-lg" placeholder="98XXXXXXXX" />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-700">AI assist</p>
+          <AiAssistPanel
+            task="job_description"
+            label="Improve description"
+            buildInput={() =>
+              [title && `Position: ${title}`, location && `Location: ${location}`, requirements && `Notes: ${requirements}`]
+                .filter(Boolean)
+                .join('\n')
+            }
+            onAccept={(result) => setRequirements(result)}
+          />
+          <AiAssistPanel
+            task="job_requirements"
+            label="Generate requirements"
+            buildInput={() =>
+              [title && `Position: ${title}`, requirements && `Context: ${requirements}`].filter(Boolean).join('\n')
+            }
+            onAccept={(result) => setRequirements((prev) => (prev ? prev + '\n\n' + result : result))}
+          />
+        </div>
         <Button type="submit" fullWidth size="lg" disabled={loading}>
           {loading ? 'Submitting…' : 'Submit Hiring Request'}
         </Button>
