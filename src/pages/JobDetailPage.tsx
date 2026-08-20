@@ -6,7 +6,8 @@ import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { useAuth } from '../contexts/AuthContext';
-import { getMyCandidateProfile } from '../services/candidateService';
+import { getMyCandidateProfile, type CandidateProfile } from '../services/candidateService';
+import { computeMatchScore } from '../lib/matchScore';
 import { isJobSaved, saveJob, unsaveJob } from '../services/savedJobService';
 import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -18,6 +19,7 @@ export default function JobDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [candProfile, setCandProfile] = useState<CandidateProfile | null>(null);
   const [saveBusy, setSaveBusy] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -31,7 +33,10 @@ export default function JobDetailPage() {
         if (user) {
           try {
             const profile = await getMyCandidateProfile(user.id);
-            if (profile) setSaved(await isJobSaved(profile.id, j.id));
+            if (profile) {
+              setCandProfile(profile);
+              setSaved(await isJobSaved(profile.id, j.id));
+            }
           } catch { /* ignore */ }
         }
       })
@@ -186,6 +191,35 @@ export default function JobDetailPage() {
 
       {/* Desktop actions */}
       <div className="hidden md:flex flex-wrap gap-3 items-center">
+        {candProfile && (() => {
+          const m = computeMatchScore({
+            jobTitle: job.title,
+            jobLocation: job.location,
+            jobSkills: job.skills,
+            jobExperience: job.experience_required,
+            jobEducation: job.education_required,
+            candidateSkills: candProfile.skills,
+            candidateLocation: candProfile.location,
+            candidateEducation: candProfile.education,
+            candidateExperienceYears: candProfile.experience_years,
+            desiredPosition: (candProfile as { desired_position?: string | null }).desired_position || candProfile.headline,
+          });
+          return (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 mb-4">
+              <p className="text-sm font-semibold text-slate-900">
+                <span className="text-[#0066FF] text-lg tabular-nums">{m.score}%</span> profile match
+              </p>
+              <ul className="mt-2 space-y-1">
+                {m.reasons.slice(0, 5).map((r) => (
+                  <li key={r.text} className={`text-xs ${r.ok ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    {r.ok ? '✓' : '⚠'} {r.text}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[11px] text-slate-400 mt-2">Guidance only — not a hiring decision.</p>
+            </div>
+          );
+        })()}
         <Button size="lg" onClick={handleApply}>Apply for this job</Button>
         <Button size="lg" variant="outline" onClick={handleSave} loading={saveBusy} aria-pressed={saved}>
           {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
