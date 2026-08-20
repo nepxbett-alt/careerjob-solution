@@ -3,7 +3,7 @@ import { Search, Briefcase, Users, ArrowRight, Shield, MessageCircle, CheckCircl
 import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-import { BRAND, LOCATIONS, CONTACT } from '../lib/config';
+import { BRAND, CONTACT } from '../lib/config';
 import { getFeaturedJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { HomeJobCard } from '../components/ui/HomeJobCard';
@@ -11,7 +11,7 @@ import { Seo } from '../components/Seo';
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
-  const [location, setLocation] = useState('Pokhara');
+  const location = 'Pokhara';
   const navigate = useNavigate();
   const [latest, setLatest] = useState<Job[]>([]);
 
@@ -29,7 +29,7 @@ export default function HomePage() {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query.trim()) params.set('q', query.trim());
-    if (location && location !== 'All Nepal') params.set('location', location);
+    params.set('location', 'Pokhara');
     navigate(`/jobs?${params.toString()}`);
   };
 
@@ -50,10 +50,10 @@ export default function HomePage() {
               Recruitment agency · Pokhara, Nepal
             </div>
             <h1 className="cj-display text-[1.9rem] sm:text-4xl md:text-[2.85rem] mb-4">
-              Find your next job in Nepal
+              Find your next job in Pokhara
             </h1>
             <p className="text-base md:text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
-              Discover trusted opportunities from {BRAND.name}. We review applications and stay with you until placement.
+              Trusted openings in Pokhara — CareerJob reviews every application and stays with you until placement.
             </p>
 
             <form onSubmit={handleSearch} className="mb-7" role="search">
@@ -71,17 +71,6 @@ export default function HomePage() {
                     autoComplete="off"
                   />
                 </div>
-                <label htmlFor="home-location" className="sr-only">Location</label>
-                <select
-                  id="home-location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="h-12 px-3 rounded-xl bg-slate-50 sm:bg-transparent border-0 text-base text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/25"
-                >
-                  {LOCATIONS.map((loc) => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
-                </select>
                 <Button type="submit" size="lg" className="h-12 px-7 rounded-xl shrink-0">
                   Search
                 </Button>

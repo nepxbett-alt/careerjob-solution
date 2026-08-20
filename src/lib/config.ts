@@ -21,17 +21,25 @@ export function getWhatsAppLink(message?: string): string {
   return `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`;
 }
 
-export const LOCATIONS = [
-  'All Nepal',
-  'Pokhara',
-  'Kathmandu',
-  'Lalitpur',
-  'Bhaktapur',
-  'Chitwan',
-  'Butwal',
-  'Biratnagar',
-  'Other',
+/** Primary market — Pokhara only */
+export const PRIMARY_CITY = 'Pokhara' as const;
+
+/** Pokhara area filters (optional detail, not other cities) */
+export const POKHARA_AREAS = [
+  'All Pokhara',
+  'Lakeside',
+  'New Road',
+  'Srijana Chowk',
+  'Mahendrapool',
+  'Zero KM',
+  'Chipledhunga',
+  'Birauta',
+  'Hemja',
+  'Other Pokhara',
 ] as const;
+
+/** @deprecated use POKHARA_AREAS — kept so old imports do not break */
+export const LOCATIONS = POKHARA_AREAS;
 
 export const JOB_TYPES = [
   { value: 'full-time', label: 'Full-time' },
@@ -55,6 +63,6 @@ export const APPLICATION_STATUSES = [
 
 export const BRAND = {
   name: 'CareerJob Solution',
-  tagline: 'Find the right opportunity. Connect with the right people.',
-  primaryColor: '#0066FF', // professional blue matching logo
+  tagline: 'Jobs in Pokhara. Real recruitment support.',
+  primaryColor: '#0066FF',
 } as const;
