@@ -6,18 +6,20 @@ import { BrandLogo } from '../BrandLogo';
 import { CONTACT } from '../../lib/config';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/cn';
+import { useI18n, LangToggle } from '../../lib/i18n';
 
 export default function PublicLayout() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const { t } = useI18n();
 
   const nav = [
-    { to: '/', label: 'Home' },
-    { to: '/jobs', label: 'Jobs' },
-    { to: '/for-businesses', label: 'For businesses' },
-    { to: '/how-it-works', label: 'How it works' },
-    { to: '/contact', label: 'Contact' },
+    { to: '/', label: t('nav_home') },
+    { to: '/jobs', label: t('nav_jobs') },
+    { to: '/for-businesses', label: t('nav_business') },
+    { to: '/how-it-works', label: t('nav_how') },
+    { to: '/contact', label: t('nav_contact') },
   ];
 
   const dashPath =
@@ -50,6 +52,7 @@ export default function PublicLayout() {
           </nav>
 
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <LangToggle className="hidden sm:inline-flex mr-1" />
             <a
               href={`tel:${CONTACT.primaryPhone}`}
               className="p-2.5 rounded-lg text-slate-600 hover:text-[#0066FF] hover:bg-slate-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -71,7 +74,7 @@ export default function PublicLayout() {
                 to="/login"
                 className="hidden sm:inline-flex text-sm font-semibold text-[#0066FF] px-3 py-2 rounded-lg hover:bg-[#E8F1FF]"
               >
-                Log in
+                {t('nav_login')}
               </Link>
             )}
             <button
@@ -109,9 +112,12 @@ export default function PublicLayout() {
               </>
             ) : (
               <Link to="/login" onClick={() => setOpen(false)} className="block py-3 px-2 text-sm font-semibold text-[#0066FF]">
-                Log in / Register
+                {t('nav_login')}
               </Link>
             )}
+            <div className="py-3 px-2">
+              <LangToggle />
+            </div>
           </div>
         )}
       </header>
