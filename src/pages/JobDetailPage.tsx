@@ -102,7 +102,6 @@ export default function JobDetailPage() {
     );
   }
 
-  const whatsappMsg = `Hello CareerJob, I am interested in the ${job.title} position in ${job.location}.`;
   const locationLabel = formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' }) || job.location;
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://careerjobsolution.com.np';
@@ -256,7 +255,7 @@ export default function JobDetailPage() {
               {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
               {saved ? 'Saved' : 'Save job'}
             </Button>
-            <WhatsAppButton message={whatsappMsg} label="Ask CareerJob" />
+            <WhatsAppButton job={job} label="Ask CareerJob" source="job_detail" />
           </>
         )}
       </div>
@@ -287,6 +286,12 @@ export default function JobDetailPage() {
             <Button fullWidth size="lg" onClick={handleApply}>
               Apply for this job
             </Button>
+            <WhatsAppButton
+              job={job}
+              source="job_detail_mobile_sticky"
+              className="shrink-0 !px-3 !w-12 !h-11 !rounded-[10px]"
+              label=""
+            />
           </div>
         </div>
       )}

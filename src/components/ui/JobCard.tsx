@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { WhatsAppButton } from '../WhatsAppButton';
 import { MapPin, Clock, Star, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
@@ -73,20 +74,28 @@ export function JobCard({ job }: { job: Job }) {
         </div>
       </Link>
 
-      {/* Functional footer: clear next action */}
+      {/* Functional footer: clear next actions */}
       <div className="flex items-center justify-between gap-2 px-4 sm:px-5 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC]">
-        <span className="text-xs text-[#6B7789] truncate">
+        <span className="text-xs text-[#6B7789] truncate min-w-0">
           {job.application_deadline
             ? `Apply by ${new Date(job.application_deadline).toLocaleDateString()}`
             : 'Open for applications'}
         </span>
-        <Link
-          to={`/jobs/${job.id}`}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-[#0066FF] hover:gap-1.5 transition-all shrink-0 min-h-[36px]"
-        >
-          View & apply
-          <ArrowRight className="w-4 h-4" aria-hidden />
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <WhatsAppButton
+            job={job}
+            source="job_card"
+            label="WhatsApp"
+            className="!h-9 !px-2.5 !text-xs !rounded-lg"
+          />
+          <Link
+            to={`/jobs/${job.id}`}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-[#0066FF] hover:gap-1.5 transition-all min-h-[36px]"
+          >
+            View & apply
+            <ArrowRight className="w-4 h-4" aria-hidden />
+          </Link>
+        </div>
       </div>
     </article>
   );

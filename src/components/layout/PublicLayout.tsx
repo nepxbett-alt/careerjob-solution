@@ -1,12 +1,56 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useMatch } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
-import { useState } from 'react';
 import { WhatsAppButton } from '../WhatsAppButton';
 import { BrandLogo } from '../BrandLogo';
 import { CONTACT } from '../../lib/config';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/cn';
 import { useI18n, LangToggle } from '../../lib/i18n';
+
+
+function JobAwareFloatingWhatsApp() {
+  const match = useMatch('/jobs/:id');
+  const [job, setJob] = useState<{ id: string; title?: string | null; location?: string | null; location_detail?: string | null } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!match?.params.id) {
+      setJob(null);
+      return;
+    }
+    const id = match.params.id;
+    // Public safe fields only
+    import('../../services/jobService').then(({ getJobById }) => {
+      getJobById(id)
+        .then((j) => {
+          if (!cancelled && j) {
+            setJob({
+              id: j.id,
+              title: j.title,
+              location: j.location,
+              location_detail: j.location_detail,
+            });
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setJob({ id });
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [match?.params.id]);
+
+  return (
+    <WhatsAppButton
+      floating
+      job={job}
+      source={job ? 'floating_job_detail' : 'floating_global'}
+    />
+  );
+}
+
 
 export default function PublicLayout() {
   const [open, setOpen] = useState(false);
@@ -156,7 +200,7 @@ export default function PublicLayout() {
         </div>
       </footer>
 
-      <WhatsAppButton floating />
+      <JobAwareFloatingWhatsApp />
     </div>
   );
 }

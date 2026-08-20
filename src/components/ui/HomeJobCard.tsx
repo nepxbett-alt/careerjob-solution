@@ -3,6 +3,7 @@ import { MapPin, Clock, ArrowUpRight, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
 import { formatJobLocation } from '../../lib/formatLocation';
+import { WhatsAppButton } from '../WhatsAppButton';
 
 /** Homepage job presentation — featured hero + compact top jobs */
 export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean }) {
@@ -12,13 +13,10 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
 
   if (isTop && featured) {
     return (
-      <Link
-        to={`/jobs/${job.id}`}
-        className="group relative block overflow-hidden rounded-2xl border border-[#0066FF]/20 bg-white p-5 sm:p-6 shadow-[0_4px_24px_rgba(0,102,255,0.08)] hover:shadow-[0_12px_36px_rgba(0,102,255,0.12)] transition-all duration-200"
-      >
+      <article className="relative overflow-hidden rounded-2xl border border-[#0066FF]/20 bg-white shadow-[0_4px_24px_rgba(0,102,255,0.08)] hover:shadow-[0_12px_36px_rgba(0,102,255,0.12)] transition-all duration-200">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0066FF] via-[#3D8BFF] to-[#0066FF]" aria-hidden />
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="min-w-0 flex-1">
+        <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+          <Link to={`/jobs/${job.id}`} className="group min-w-0 flex-1">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0066FF] mb-2.5">
               <Star className="w-3.5 h-3.5 fill-current" aria-hidden />
               Top in Pokhara
@@ -61,45 +59,59 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
                 </span>
               )}
             </div>
+          </Link>
+          <div className="flex sm:flex-col items-center gap-2 shrink-0">
+            <WhatsAppButton job={job} source="home_featured" label="WhatsApp" className="!h-10 !text-sm" />
+            <Link
+              to={`/jobs/${job.id}`}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0066FF] hover:gap-2.5 transition-all min-h-[40px]"
+            >
+              View job
+              <ArrowUpRight className="w-4 h-4" aria-hidden />
+            </Link>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0066FF] shrink-0 self-start sm:self-center group-hover:gap-2.5 transition-all">
-            View job
-            <ArrowUpRight className="w-4 h-4" aria-hidden />
-          </span>
         </div>
-      </Link>
+      </article>
     );
   }
 
   return (
-    <Link
-      to={`/jobs/${job.id}`}
-      className="group flex items-center gap-3 sm:gap-4 bg-white border border-[#E8ECF1] rounded-xl sm:rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 hover:border-[#0066FF]/30 hover:shadow-sm transition-all duration-150 active:scale-[0.995]"
-    >
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-[0.95rem] sm:text-base text-[#0B1220] tracking-tight group-hover:text-[#0066FF] transition-colors leading-snug truncate">
-            {job.title}
-          </h3>
-          {job.is_featured && (
-            <Star className="w-3.5 h-3.5 text-[#0066FF] fill-[#0066FF] shrink-0" aria-label="Top in Pokhara" />
-          )}
+    <article className="flex items-center gap-2 sm:gap-3 bg-white border border-[#E8ECF1] rounded-xl sm:rounded-2xl px-3 py-3 sm:px-4 sm:py-3.5 hover:border-[#0066FF]/30 hover:shadow-sm transition-all duration-150">
+      <Link
+        to={`/jobs/${job.id}`}
+        className="group flex items-center gap-3 sm:gap-4 min-w-0 flex-1 active:scale-[0.995]"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-[0.95rem] sm:text-base text-[#0B1220] tracking-tight group-hover:text-[#0066FF] transition-colors leading-snug truncate">
+              {job.title}
+            </h3>
+            {job.is_featured && (
+              <Star className="w-3.5 h-3.5 text-[#0066FF] fill-[#0066FF] shrink-0" aria-label="Top in Pokhara" />
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[12px] sm:text-[13px] text-[#6B7789]">
+            <span className="inline-flex items-center gap-1 truncate">
+              <MapPin className="w-3.5 h-3.5 shrink-0 text-[#98A2B3]" aria-hidden />
+              {locationLabel}
+            </span>
+            {job.salary_display && (
+              <span className="font-semibold text-[#0B1220]">{job.salary_display}</span>
+            )}
+            <span className="capitalize">{job.job_type.replace('-', ' ')}</span>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[12px] sm:text-[13px] text-[#6B7789]">
-          <span className="inline-flex items-center gap-1 truncate">
-            <MapPin className="w-3.5 h-3.5 shrink-0 text-[#98A2B3]" aria-hidden />
-            {locationLabel}
-          </span>
-          {job.salary_display && (
-            <span className="font-semibold text-[#0B1220]">{job.salary_display}</span>
-          )}
-          <span className="capitalize">{job.job_type.replace('-', ' ')}</span>
-        </div>
-      </div>
-      <ArrowUpRight
-        className="w-4.5 h-4.5 text-[#C5CDD8] group-hover:text-[#0066FF] shrink-0 transition-colors"
-        aria-hidden
+        <ArrowUpRight
+          className="w-4.5 h-4.5 text-[#C5CDD8] group-hover:text-[#0066FF] shrink-0 transition-colors"
+          aria-hidden
+        />
+      </Link>
+      <WhatsAppButton
+        job={job}
+        source="home_latest"
+        label=""
+        className="!h-9 !w-9 !px-0 !rounded-lg shrink-0"
       />
-    </Link>
+    </article>
   );
 }
