@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, Search, FileText } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
@@ -15,6 +16,8 @@ interface CandidateRow {
   created_at: string;
   email: string | null;
   skills: string[] | null;
+  desired_position?: string | null;
+  seeker_status?: string | null;
 }
 
 export default function CandidatesPage() {
@@ -27,7 +30,7 @@ export default function CandidatesPage() {
     setLoading(true);
     let query = supabase
       .from('candidate_profiles')
-      .select('id, full_name, phone, location, profile_completion, cv_url, is_verified, created_at, email, skills')
+      .select('id, full_name, phone, location, profile_completion, cv_url, is_verified, created_at, email, skills, desired_position, seeker_status')
       .order('created_at', { ascending: false })
       .limit(200);
     if (q.trim()) {
@@ -93,7 +96,9 @@ export default function CandidatesPage() {
             <div className="flex flex-wrap justify-between gap-2">
               <div>
                 <div className="font-semibold text-slate-900 flex items-center gap-2">
+                  <Link to={`/admin/candidates/${c.id}`} className="hover:text-[#0066FF]">
                   {c.full_name}
+                  </Link>
                   {c.is_verified && (
                     <span className="text-[10px] uppercase tracking-wide bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold">
                       Verified
@@ -122,6 +127,9 @@ export default function CandidatesPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2 h-fit">
+                <Link to={`/admin/candidates/${c.id}`}>
+                  <Button size="sm">Open</Button>
+                </Link>
                 {c.phone && (
                   <a href={`tel:${c.phone}`}>
                     <Button size="sm" variant="outline">

@@ -35,6 +35,7 @@ import AdminPlacements from './pages/admin/PlacementsPage';
 import AdminAccounting from './pages/admin/AccountingPage';
 import AdminSettings from './pages/admin/SettingsPage';
 import AdminWalkIn from './pages/admin/WalkInPage';
+import AdminCandidateDetail from './pages/admin/CandidateDetailPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -99,6 +100,7 @@ export default function App() {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="candidates" element={<AdminCandidates />} />
+          <Route path="candidates/:id" element={<AdminCandidateDetail />} />
           <Route path="walk-in" element={<AdminWalkIn />} />
           <Route path="jobs" element={<AdminJobs />} />
           <Route path="applications" element={<AdminApplications />} />

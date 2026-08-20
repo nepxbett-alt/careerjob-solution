@@ -18,6 +18,16 @@ const STYLES: Record<string, string> = {
   scheduled: 'bg-violet-50 text-violet-800 ring-1 ring-violet-100',
   completed: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
   cancelled: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
+  active: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  employed: 'bg-sky-50 text-sky-800 ring-1 ring-sky-100',
+  inactive: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
+  passive: 'bg-amber-50 text-amber-800 ring-1 ring-amber-100',
+  pending: 'bg-amber-50 text-amber-800 ring-1 ring-amber-100',
+  invoiced: 'bg-violet-50 text-violet-800 ring-1 ring-violet-100',
+  paid: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  approaching: 'bg-amber-50 text-amber-800 ring-1 ring-amber-100',
+  hired: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
+  left: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
 };
 
 const LABELS: Record<string, string> = {
@@ -38,6 +48,16 @@ const LABELS: Record<string, string> = {
   scheduled: 'Scheduled',
   completed: 'Completed',
   cancelled: 'Cancelled',
+  active: 'Active seeker',
+  employed: 'Employed',
+  inactive: 'Inactive',
+  passive: 'Passive',
+  pending: 'Pending',
+  invoiced: 'Invoiced',
+  paid: 'Paid',
+  approaching: 'Approaching',
+  hired: 'Hired',
+  left: 'Left',
 };
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
