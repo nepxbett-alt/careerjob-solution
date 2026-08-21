@@ -217,12 +217,28 @@ export default function JobsPage() {
 
         {!loading && !error && jobs.length === 0 && (
           <EmptyState
-            title="No jobs in Pokhara right now"
-            description="New roles are added often. Message CareerJob on WhatsApp or check back soon."
+            title={
+              filters.location && filters.location !== 'All Pokhara' && filters.location !== 'Pokhara'
+                ? `No jobs in ${filters.location} right now`
+                : filters.q
+                  ? `No jobs matching “${filters.q}”`
+                  : 'No open jobs right now'
+            }
+            description={
+              hasFilters
+                ? 'Try All Pokhara, clear filters, or check back soon — new roles are added regularly.'
+                : 'New roles are added often. Message CareerJob on WhatsApp or check back soon.'
+            }
             action={
               <div className="flex flex-wrap justify-center gap-2">
-                {hasFilters && <Button variant="outline" onClick={clearAll}>Clear filters</Button>}
-                <Link to="/contact"><Button>Contact us</Button></Link>
+                {hasFilters && (
+                  <Button variant="outline" onClick={clearAll}>
+                    Clear filters
+                  </Button>
+                )}
+                <Link to="/contact">
+                  <Button variant={hasFilters ? 'primary' : 'outline'}>Contact us</Button>
+                </Link>
               </div>
             }
           />

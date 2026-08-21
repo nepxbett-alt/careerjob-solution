@@ -8,6 +8,7 @@ import { getFeaturedJobs, searchJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { HomeJobCard } from '../components/ui/HomeJobCard';
 import { JobCard } from '../components/ui/JobCard';
+import { JobCardSkeleton } from '../components/ui/Skeleton';
 import { Seo } from '../components/Seo';
 import { useI18n } from '../lib/i18n';
 
@@ -137,7 +138,7 @@ export default function HomePage() {
           {jobsLoading ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-28 rounded-2xl bg-white border border-[#E8ECF1] animate-pulse" />
+                <JobCardSkeleton key={i} />
               ))}
             </div>
           ) : (

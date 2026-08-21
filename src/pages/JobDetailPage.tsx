@@ -275,26 +275,17 @@ export default function JobDetailPage() {
         </div>
       )}
 
-      {/* Mobile sticky CTA — hidden while applying */}
+      {/* Mobile sticky CTA — Apply primary; WhatsApp secondary; hidden while applying */}
       {!showApply && (
         <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-[#E8ECF1] safe-bottom md:hidden z-30">
-          <div className="flex gap-2 max-w-lg mx-auto">
-            <Button
-              variant="outline"
-              className="shrink-0 min-w-[48px] px-3"
-              onClick={handleSave}
-              loading={saveBusy}
-              aria-label={saved ? 'Unsave job' : 'Save job'}
-            >
-              {saved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
-            </Button>
+          <div className="flex gap-2 max-w-lg mx-auto items-center">
             <Button fullWidth size="lg" onClick={handleApply}>
               Apply for this job
             </Button>
             <WhatsAppButton
               job={job}
               source="job_detail_mobile_sticky"
-              className="shrink-0 !px-3 !w-12 !h-11 !rounded-[10px]"
+              className="shrink-0 !h-12 !w-12 !px-0 !rounded-xl !bg-white !text-[#128C7E] !border !border-[#E8ECF1] hover:!bg-[#ECFDF5]"
               label=""
             />
           </div>
