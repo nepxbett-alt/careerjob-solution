@@ -218,10 +218,10 @@ export default function JobsPage() {
         {!loading && !error && jobs.length === 0 && (
           <EmptyState
             title={
-              filters.location && filters.location !== 'All Pokhara' && filters.location !== 'Pokhara'
-                ? `No jobs in ${filters.location} right now`
-                : filters.q
-                  ? `No jobs matching “${filters.q}”`
+              area && area !== 'All Pokhara' && area !== 'Pokhara'
+                ? `No jobs in ${area} right now`
+                : q
+                  ? `No jobs matching “${q}”`
                   : 'No open jobs right now'
             }
             description={
