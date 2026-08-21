@@ -20,7 +20,7 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
           <Link to={`/jobs/${job.id}`} className="group min-w-0 flex-1">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0066FF] mb-2.5">
               <Star className="w-3.5 h-3.5 fill-current" aria-hidden />
-              Top in Pokhara
+              Featured
             </span>
             <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0B1220] group-hover:text-[#0066FF] transition-colors leading-snug">
               {formatJobTitle(job.title) || job.title}
@@ -88,7 +88,7 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
               {formatJobTitle(job.title) || job.title}
             </h3>
             {job.is_featured && (
-              <Star className="w-3.5 h-3.5 text-[#0066FF] fill-[#0066FF] shrink-0" aria-label="Top in Pokhara" />
+              <Star className="w-3.5 h-3.5 text-[#0066FF] fill-[#0066FF] shrink-0" aria-label="Featured" />
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[12px] sm:text-[13px] text-[#6B7789]">
