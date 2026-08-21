@@ -212,3 +212,10 @@ html, body {
   background: var(--cj-border);
   border: 0;
 }
+
+/* Hide scrollbar on horizontal chip rows (keep scroll) */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar { display: none; }

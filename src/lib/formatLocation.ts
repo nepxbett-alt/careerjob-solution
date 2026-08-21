@@ -1,6 +1,8 @@
 /**
  * Format job location for display without inventing data or duplicating segments.
  */
+import { formatPlaceName } from './formatText';
+
 export function formatJobLocation(
   location?: string | null,
   locationDetail?: string | null,
@@ -9,7 +11,7 @@ export function formatJobLocation(
   const cityHint = opts?.cityHint?.trim() || '';
 
   const parts = [locationDetail, location]
-    .map((s) => (s || '').trim().replace(/\s+/g, ' '))
+    .map((s) => formatPlaceName(s))
     .filter(Boolean);
 
   // Dedupe case-insensitive exact matches while preserving first casing
@@ -26,11 +28,9 @@ export function formatJobLocation(
     return cityHint || '';
   }
 
-  // If a single segment already contains the city hint, don't append
   if (cityHint) {
     const hasCity = unique.some((u) => u.toLowerCase().includes(cityHint.toLowerCase()));
     if (!hasCity && unique.length === 1) {
-      // Area-only like "Lakeside" → "Lakeside, Pokhara" when hint provided
       return `${unique[0]}, ${cityHint}`;
     }
   }

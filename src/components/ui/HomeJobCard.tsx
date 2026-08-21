@@ -3,6 +3,7 @@ import { MapPin, Clock, ArrowUpRight, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
 import { formatJobLocation } from '../../lib/formatLocation';
+import { formatJobTitle } from '../../lib/formatText';
 import { WhatsAppButton } from '../WhatsAppButton';
 
 /** Homepage job presentation — featured hero + compact top jobs */
@@ -22,7 +23,7 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
               Top in Pokhara
             </span>
             <h3 className="text-lg sm:text-xl font-bold tracking-tight text-[#0B1220] group-hover:text-[#0066FF] transition-colors leading-snug">
-              {job.title}
+              {formatJobTitle(job.title) || job.title}
             </h3>
             {job.public_employer_label && (
               <p className="text-sm text-[#6B7789] mt-1.5">{job.public_employer_label}</p>
@@ -84,7 +85,7 @@ export function HomeJobCard({ job, featured }: { job: Job; featured?: boolean })
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-[0.95rem] sm:text-base text-[#0B1220] tracking-tight group-hover:text-[#0066FF] transition-colors leading-snug truncate">
-              {job.title}
+              {formatJobTitle(job.title) || job.title}
             </h3>
             {job.is_featured && (
               <Star className="w-3.5 h-3.5 text-[#0066FF] fill-[#0066FF] shrink-0" aria-label="Top in Pokhara" />

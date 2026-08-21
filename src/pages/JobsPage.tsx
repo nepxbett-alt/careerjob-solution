@@ -108,7 +108,7 @@ export default function JobsPage() {
           </form>
 
           {/* Pokhara area chips only */}
-          <div className="flex gap-2 overflow-x-auto pt-3 pb-0.5 -mx-1 px-1">
+          <div className="flex gap-2 overflow-x-auto pt-3 pb-0.5 -mx-1 px-1 scrollbar-none">
             {POKHARA_AREAS.map((a) => {
               const active = a === 'All Pokhara' ? !area || area === 'All Pokhara' : area === a;
               return (

@@ -1,4 +1,5 @@
 import { formatJobLocation } from '../lib/formatLocation';
+import { formatJobTitle } from '../lib/formatText';
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, ArrowLeft, Bookmark, BookmarkCheck } from 'lucide-react';
@@ -96,7 +97,7 @@ export default function JobDetailPage() {
   if (error || !job) {
     return (
       <div className="cj-container max-w-3xl py-16 text-center">
-        <p className="text-slate-600 mb-4">{error || 'Job not found'}</p>
+        <p className="text-[#3D4A5C] mb-4">{error || 'Job not found'}</p>
         <Link to="/jobs"><Button>Back to jobs</Button></Link>
       </div>
     );
@@ -137,31 +138,31 @@ export default function JobDetailPage() {
         canonical={canonical}
         jsonLd={jsonLd}
       />
-      <Link to="/jobs" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0066FF] mb-6 min-h-[44px]">
+      <Link to="/jobs" className="inline-flex items-center gap-1.5 text-sm text-[#6B7789] hover:text-[#0066FF] mb-6 min-h-[44px]">
         <ArrowLeft className="w-4 h-4" aria-hidden /> Back to jobs
       </Link>
 
       <header className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-3">{job.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-[#0B1220] tracking-tight mb-3">{formatJobTitle(job.title) || job.title}</h1>
         {job.public_employer_label && (
-          <p className="text-slate-500 mb-3">{job.public_employer_label}</p>
+          <p className="text-[#6B7789] mb-3">{job.public_employer_label}</p>
         )}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-600">
-          <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4 text-slate-400" aria-hidden />{locationLabel}</span>
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#3D4A5C]">
+          <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#98A2B3]" aria-hidden />{locationLabel}</span>
           {job.job_categories?.name && (
-            <span className="inline-flex items-center gap-1.5"><Briefcase className="w-4 h-4 text-slate-400" aria-hidden />{job.job_categories.name}</span>
+            <span className="inline-flex items-center gap-1.5"><Briefcase className="w-4 h-4 text-[#98A2B3]" aria-hidden />{job.job_categories.name}</span>
           )}
           {job.published_at && (
-            <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400" aria-hidden />{formatDistanceToNow(new Date(job.published_at), { addSuffix: true })}</span>
+            <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#98A2B3]" aria-hidden />{formatDistanceToNow(new Date(job.published_at), { addSuffix: true })}</span>
           )}
         </div>
         <div className="flex flex-wrap gap-2 mt-4">
           {job.salary_display && (
-            <span className="font-medium bg-slate-100 text-slate-800 px-3 py-1 rounded-lg text-sm">{job.salary_display}</span>
+            <span className="font-medium bg-[#EEF2F7] text-[#0B1220] px-3 py-1 rounded-lg text-sm">{job.salary_display}</span>
           )}
-          <span className="bg-slate-50 text-slate-700 px-3 py-1 rounded-lg text-sm capitalize">{job.job_type.replace('-', ' ')}</span>
+          <span className="bg-[#F7F9FC] text-[#3D4A5C] px-3 py-1 rounded-lg text-sm capitalize">{job.job_type.replace('-', ' ')}</span>
           {job.experience_required && (
-            <span className="bg-slate-50 text-slate-700 px-3 py-1 rounded-lg text-sm">{job.experience_required}</span>
+            <span className="bg-[#F7F9FC] text-[#3D4A5C] px-3 py-1 rounded-lg text-sm">{job.experience_required}</span>
           )}
         </div>
       </header>
@@ -182,30 +183,30 @@ export default function JobDetailPage() {
           <>
             {hasDesc && (
               <section className="mb-8">
-                <h2 className="font-semibold text-lg text-slate-900 mb-2">About this role</h2>
-                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.description}</div>
+                <h2 className="font-semibold text-lg text-[#0B1220] mb-2">About this role</h2>
+                <div className="text-[#3D4A5C] whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.description}</div>
               </section>
             )}
             {hasResp && (
               <section className="mb-8">
-                <h2 className="font-semibold text-lg text-slate-900 mb-2">Responsibilities</h2>
-                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.responsibilities}</div>
+                <h2 className="font-semibold text-lg text-[#0B1220] mb-2">Responsibilities</h2>
+                <div className="text-[#3D4A5C] whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.responsibilities}</div>
               </section>
             )}
             {hasReq && (
               <section className="mb-8">
-                <h2 className="font-semibold text-lg text-slate-900 mb-2">Requirements</h2>
-                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.requirements}</div>
+                <h2 className="font-semibold text-lg text-[#0B1220] mb-2">Requirements</h2>
+                <div className="text-[#3D4A5C] whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.requirements}</div>
               </section>
             )}
             {hasBen && (
               <section className="mb-8">
-                <h2 className="font-semibold text-lg text-slate-900 mb-2">Benefits</h2>
-                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.benefits}</div>
+                <h2 className="font-semibold text-lg text-[#0B1220] mb-2">Benefits</h2>
+                <div className="text-[#3D4A5C] whitespace-pre-wrap leading-relaxed text-[0.95rem]">{job.benefits}</div>
               </section>
             )}
             {!any && (
-              <p className="text-sm text-slate-500 mb-6 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+              <p className="text-sm text-[#6B7789] mb-6 rounded-xl border border-[#E8ECF1] bg-[#F7F9FC] px-4 py-3">
                 Additional role details were not provided by the employer. CareerJob can share more information during the recruitment process.
               </p>
             )}
@@ -213,7 +214,7 @@ export default function JobDetailPage() {
         );
       })()}
 
-      <p className="text-xs text-slate-400 mb-8 leading-relaxed">
+      <p className="text-xs text-[#98A2B3] mb-8 leading-relaxed">
         Employer details and exact interview information may be provided by CareerJob during the recruitment process.
       </p>
 
@@ -233,8 +234,8 @@ export default function JobDetailPage() {
             desiredPosition: (candProfile as { desired_position?: string | null }).desired_position || candProfile.headline,
           });
           return (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 mb-4">
-              <p className="text-sm font-semibold text-slate-900">
+            <div className="rounded-2xl border border-[#E8ECF1] bg-[#F7F9FC] p-4 mb-4">
+              <p className="text-sm font-semibold text-[#0B1220]">
                 <span className="text-[#0066FF] text-lg tabular-nums">{m.score}%</span> profile match
               </p>
               <ul className="mt-2 space-y-1">
@@ -244,7 +245,7 @@ export default function JobDetailPage() {
                   </li>
                 ))}
               </ul>
-              <p className="text-[11px] text-slate-400 mt-2">Guidance only — not a hiring decision.</p>
+              <p className="text-[11px] text-[#98A2B3] mt-2">Guidance only — not a hiring decision.</p>
             </div>
           );
         })()}
@@ -261,7 +262,7 @@ export default function JobDetailPage() {
       </div>
 
       {showApply && (
-        <div id="public-apply-form" className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+        <div id="public-apply-form" className="mt-8 rounded-2xl border border-[#E8ECF1] bg-white p-5 sm:p-6 shadow-sm">
           <PublicApplyForm
             jobId={job.id}
             jobTitle={job.title}
@@ -272,7 +273,7 @@ export default function JobDetailPage() {
 
       {/* Mobile sticky CTA — hidden while applying */}
       {!showApply && (
-        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom md:hidden z-30">
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur border-t border-[#E8ECF1] safe-bottom md:hidden z-30">
           <div className="flex gap-2 max-w-lg mx-auto">
             <Button
               variant="outline"

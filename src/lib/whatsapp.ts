@@ -4,6 +4,7 @@
  */
 import { CONTACT, WHATSAPP_BASE } from './config';
 import { formatJobLocation } from './formatLocation';
+import { formatJobTitle } from './formatText';
 import type { Lang } from './i18n';
 
 /** Minimal job shape for WhatsApp — public fields only */
@@ -22,7 +23,7 @@ const SITE_ORIGIN =
     : 'https://careerjobsolution.com.np';
 
 function safeTitle(job: WhatsAppJobInput): string | null {
-  const t = (job.title || '').trim();
+  const t = formatJobTitle(job.title) || (job.title || '').trim();
   if (!t || t.toLowerCase() === 'undefined' || t.toLowerCase() === 'null') return null;
   return t;
 }

@@ -4,6 +4,7 @@ import { MapPin, Clock, Star, ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Job } from '../../services/jobService';
 import { formatJobLocation } from '../../lib/formatLocation';
+import { formatJobTitle } from '../../lib/formatText';
 
 export function JobCard({ job }: { job: Job }) {
   const locationLabel = formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' });
@@ -31,7 +32,7 @@ export function JobCard({ job }: { job: Job }) {
               </span>
             )}
             <h2 className="font-semibold text-[1.05rem] sm:text-lg text-[#0B1220] tracking-tight group-hover:text-[#0066FF] transition-colors leading-snug">
-              {job.title}
+              {formatJobTitle(job.title) || job.title}
             </h2>
             {job.public_employer_label && (
               <p className="text-sm text-[#6B7789] mt-1 truncate">{job.public_employer_label}</p>
