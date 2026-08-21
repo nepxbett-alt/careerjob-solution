@@ -22,6 +22,7 @@ export default function JobsPage() {
   const q = searchParams.get('q') || '';
   const area = searchParams.get('area') || '';
   const jobType = searchParams.get('type') || '';
+  const category = searchParams.get('category') || '';
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function JobsPage() {
       q: q || undefined,
       location: area && area !== 'All Pokhara' ? area : undefined,
       job_type: jobType || undefined,
+      category: category || undefined,
       page,
       limit: 24,
     })
@@ -42,7 +44,7 @@ export default function JobsPage() {
       })
       .catch(() => setError("We couldn't load jobs. Please try again."))
       .finally(() => setLoading(false));
-  }, [q, area, jobType, page]);
+  }, [q, area, jobType, category, page]);
 
   const updateParams = (patch: Record<string, string | undefined>) => {
     const next = new URLSearchParams(searchParams);
@@ -50,7 +52,7 @@ export default function JobsPage() {
       if (!v) next.delete(k);
       else next.set(k, v);
     });
-    if ('q' in patch || 'area' in patch || 'type' in patch) next.delete('page');
+    if ('q' in patch || 'area' in patch || 'type' in patch || 'category' in patch) next.delete('page');
     setSearchParams(next);
   };
 
@@ -66,7 +68,7 @@ export default function JobsPage() {
     setShowFilters(false);
   };
 
-  const hasFilters = !!q || (!!area && area !== 'All Pokhara') || !!jobType;
+  const hasFilters = !!q || (!!area && area !== 'All Pokhara') || !!jobType || !!category;
 
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
@@ -192,6 +194,14 @@ export default function JobsPage() {
               </p>
             )}
           </div>
+          {category && (
+            <p className="text-sm text-[#6B7789] mb-2">
+              Filtered by category ·{' '}
+              <button type="button" className="text-[#0066FF] font-medium" onClick={() => updateParams({ category: undefined })}>
+                Clear category
+              </button>
+            </p>
+          )}
           {hasFilters && (
             <button type="button" onClick={clearAll} className="text-sm font-medium text-[#0066FF]">
               Reset

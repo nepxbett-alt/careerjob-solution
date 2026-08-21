@@ -221,3 +221,50 @@ export async function createAdminJob(input: AdminCreateJobInput) {
   if (error) throw error;
   return data;
 }
+
+export interface CategoryCount {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+/** Active categories with published job counts (only categories that have jobs). */
+export async function getCategoriesWithCounts(): Promise<CategoryCount[]> {
+  const [{ data: cats, error: cErr }, { data: jobs, error: jErr }] = await Promise.all([
+    supabase
+      .from('job_categories')
+      .select('id, name, slug')
+      .eq('is_active', true)
+      .order('name'),
+    supabase
+      .from('jobs')
+      .select('category_id')
+      .eq('status', 'published')
+      .eq('approved_by_agency', true),
+  ]);
+  if (cErr) throw cErr;
+  if (jErr) throw jErr;
+
+  const counts = new Map<string, number>();
+  for (const j of jobs || []) {
+    const id = (j as { category_id?: string | null }).category_id;
+    if (!id) continue;
+    counts.set(id, (counts.get(id) || 0) + 1);
+  }
+
+  return ((cats || []) as { id: string; name: string; slug: string }[])
+    .map((c) => ({ ...c, count: counts.get(c.id) || 0 }))
+    .filter((c) => c.count > 0)
+    .sort((a, b) => b.count - a.count);
+}
+
+export async function getPublishedJobCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from('jobs')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'published')
+    .eq('approved_by_agency', true);
+  if (error) throw error;
+  return count || 0;
+}
