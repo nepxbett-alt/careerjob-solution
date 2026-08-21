@@ -142,3 +142,82 @@ export async function setJobFeatured(jobId: string, featured: boolean) {
   if (error) throw error;
   return data;
 }
+
+export interface AdminCreateJobInput {
+  title: string;
+  location?: string;
+  location_detail?: string | null;
+  job_type?: string;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  experience_required?: string | null;
+  education_required?: string | null;
+  description?: string | null;
+  responsibilities?: string | null;
+  requirements?: string | null;
+  benefits?: string | null;
+  public_employer_label?: string | null;
+  is_featured?: boolean;
+  /** If true: status published + approved + published_at */
+  publish?: boolean;
+  created_by?: string | null;
+}
+
+function buildSalaryDisplay(min?: number | null, max?: number | null): string | null {
+  if (min != null && max != null && min >= 1000 && max >= 1000) {
+    const lo = Math.min(min, max);
+    const hi = Math.max(min, max);
+    if (lo === hi) return `NPR ${lo}`;
+    return `NPR ${lo}–${hi}`;
+  }
+  if (min != null && min >= 1000) return `NPR ${min}+`;
+  if (max != null && max >= 1000) return `Up to NPR ${max}`;
+  return null;
+}
+
+/** Staff/admin creates a vacancy directly (walk-in employer or internal listing). */
+export async function createAdminJob(input: AdminCreateJobInput) {
+  const title = (input.title || '').trim();
+  if (!title) throw new Error('Job title is required');
+
+  let salaryMin = input.salary_min ?? null;
+  let salaryMax = input.salary_max ?? null;
+  if (salaryMin != null && salaryMin < 1000) salaryMin = null;
+  if (salaryMax != null && salaryMax < 1000) salaryMax = null;
+  if (salaryMin != null && salaryMax != null && salaryMin > salaryMax) {
+    const t = salaryMin;
+    salaryMin = salaryMax;
+    salaryMax = t;
+  }
+
+  const publish = !!input.publish;
+  const location = (input.location || 'Pokhara').trim() || 'Pokhara';
+  const locationDetail = (input.location_detail || '').trim() || null;
+
+  const row = {
+    title,
+    location,
+    location_detail: locationDetail,
+    job_type: input.job_type || 'full-time',
+    salary_min: salaryMin,
+    salary_max: salaryMax,
+    salary_display: buildSalaryDisplay(salaryMin, salaryMax),
+    experience_required: (input.experience_required || '').trim() || null,
+    education_required: (input.education_required || '').trim() || null,
+    description: (input.description || '').trim() || null,
+    responsibilities: (input.responsibilities || '').trim() || null,
+    requirements: (input.requirements || '').trim() || null,
+    benefits: (input.benefits || '').trim() || null,
+    public_employer_label: (input.public_employer_label || '').trim() || null,
+    is_featured: !!input.is_featured,
+    status: publish ? 'published' : 'draft',
+    approved_by_agency: publish,
+    published_at: publish ? new Date().toISOString() : null,
+    created_by: input.created_by || null,
+    employer_name_private: true,
+  };
+
+  const { data, error } = await supabase.from('jobs').insert(row).select('id, title, status').single();
+  if (error) throw error;
+  return data;
+}

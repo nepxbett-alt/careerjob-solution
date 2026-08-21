@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Star, Eraser } from 'lucide-react';
+import { ExternalLink, Star, Eraser, Plus, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { publishJob } from '../../services/businessService';
-import { setJobFeatured } from '../../services/jobService';
+import { setJobFeatured, createAdminJob } from '../../services/jobService';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { formatJobTitle, formatSalaryDisplay, formatJobType } from '../../lib/formatText';
+import { JOB_TYPES, POKHARA_AREAS } from '../../lib/config';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface JobRow {
   id: string;
@@ -24,6 +26,23 @@ interface JobRow {
   is_featured: boolean | null;
 }
 
+const emptyForm = {
+  title: '',
+  location_detail: '',
+  job_type: 'full-time',
+  salary_min: '',
+  salary_max: '',
+  experience_required: '',
+  education_required: '',
+  description: '',
+  responsibilities: '',
+  requirements: '',
+  benefits: '',
+  public_employer_label: '',
+  is_featured: false,
+  publish: true,
+};
+
 function isBadSalary(j: JobRow): boolean {
   const mn = j.salary_min;
   const mx = j.salary_max;
@@ -35,11 +54,16 @@ function isBadSalary(j: JobRow): boolean {
 }
 
 export default function JobsPage() {
+  const { user } = useAuth();
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [filter, setFilter] = useState<'all' | 'published' | 'draft' | 'paused' | 'closed' | 'featured'>('all');
+  const [showCreate, setShowCreate] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -149,6 +173,60 @@ export default function JobsPage() {
     }
   };
 
+  const setField = (key: keyof typeof emptyForm, value: string | boolean) => {
+    setForm((f) => ({ ...f, [key]: value }));
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+    if (!form.title.trim()) {
+      setFormError('Title is required.');
+      return;
+    }
+    const min = form.salary_min ? parseInt(form.salary_min, 10) : null;
+    const max = form.salary_max ? parseInt(form.salary_max, 10) : null;
+    if ((form.salary_min && (min == null || Number.isNaN(min))) || (form.salary_max && (max == null || Number.isNaN(max)))) {
+      setFormError('Salary must be a number (NPR).');
+      return;
+    }
+    if ((min != null && min > 0 && min < 1000) || (max != null && max > 0 && max < 1000)) {
+      setFormError('Salary should be at least NPR 1,000, or leave blank.');
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await createAdminJob({
+        title: form.title.trim(),
+        location: 'Pokhara',
+        location_detail: form.location_detail || null,
+        job_type: form.job_type,
+        salary_min: min,
+        salary_max: max,
+        experience_required: form.experience_required || null,
+        education_required: form.education_required || null,
+        description: form.description || null,
+        responsibilities: form.responsibilities || null,
+        requirements: form.requirements || null,
+        benefits: form.benefits || null,
+        public_employer_label: form.public_employer_label || null,
+        is_featured: form.is_featured,
+        publish: form.publish,
+        created_by: user?.id || null,
+      });
+      setForm(emptyForm);
+      setShowCreate(false);
+      if (form.publish) setFilter('published');
+      else setFilter('draft');
+      await load();
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Could not create job.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const featuredCount = jobs.filter((j) => j.is_featured).length;
   const badCount = jobs.filter(isBadSalary).length;
 
@@ -158,15 +236,265 @@ export default function JobsPage() {
         <div>
           <h1 className="text-xl font-bold tracking-tight text-[#0B1220]">Jobs</h1>
           <p className="text-sm text-[#6B7789] mt-0.5">
-            Publish roles · Mark <strong>Featured</strong> for homepage (aim for 4–6)
+            Create vacancies · Publish · Feature for homepage (aim for 4–6)
           </p>
         </div>
-        <Link to="/admin/businesses">
-          <Button size="sm" variant="outline">
-            From hiring requests →
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            onClick={() => {
+              setShowCreate((v) => !v);
+              setFormError(null);
+            }}
+          >
+            {showCreate ? (
+              <>
+                <X className="w-3.5 h-3.5" aria-hidden /> Close form
+              </>
+            ) : (
+              <>
+                <Plus className="w-3.5 h-3.5" aria-hidden /> Create job
+              </>
+            )}
           </Button>
-        </Link>
+          <Link to="/admin/businesses">
+            <Button size="sm" variant="outline">
+              From hiring requests →
+            </Button>
+          </Link>
+        </div>
       </div>
+
+      {showCreate && (
+        <form
+          onSubmit={handleCreate}
+          className="mb-6 rounded-2xl border border-[#0066FF]/25 bg-white p-4 sm:p-5 shadow-sm space-y-4"
+        >
+          <div>
+            <h2 className="font-semibold text-[#0B1220]">New vacancy</h2>
+            <p className="text-xs text-[#6B7789] mt-0.5">
+              For walk-in employers or roles CareerJob posts directly. No business account required.
+            </p>
+          </div>
+
+          {formError && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+              {formError}
+            </div>
+          )}
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="job-title">
+                Job title <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="job-title"
+                className="cj-input"
+                required
+                value={form.title}
+                onChange={(e) => setField('title', e.target.value)}
+                placeholder="e.g. Receptionist, Waiter, Driver"
+              />
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="job-area">
+                Area in Pokhara
+              </label>
+              <select
+                id="job-area"
+                className="cj-input"
+                value={form.location_detail}
+                onChange={(e) => setField('location_detail', e.target.value)}
+              >
+                <option value="">Pokhara (general)</option>
+                {POKHARA_AREAS.filter((a) => a !== 'All Pokhara').map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="job-type">
+                Job type
+              </label>
+              <select
+                id="job-type"
+                className="cj-input"
+                value={form.job_type}
+                onChange={(e) => setField('job_type', e.target.value)}
+              >
+                {JOB_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="sal-min">
+                Salary min (NPR)
+              </label>
+              <input
+                id="sal-min"
+                className="cj-input"
+                inputMode="numeric"
+                value={form.salary_min}
+                onChange={(e) => setField('salary_min', e.target.value)}
+                placeholder="e.g. 15000"
+              />
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="sal-max">
+                Salary max (NPR)
+              </label>
+              <input
+                id="sal-max"
+                className="cj-input"
+                inputMode="numeric"
+                value={form.salary_max}
+                onChange={(e) => setField('salary_max', e.target.value)}
+                placeholder="e.g. 20000"
+              />
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="exp">
+                Experience
+              </label>
+              <input
+                id="exp"
+                className="cj-input"
+                value={form.experience_required}
+                onChange={(e) => setField('experience_required', e.target.value)}
+                placeholder="e.g. 1+ year"
+              />
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="edu">
+                Education
+              </label>
+              <input
+                id="edu"
+                className="cj-input"
+                value={form.education_required}
+                onChange={(e) => setField('education_required', e.target.value)}
+                placeholder="e.g. +2, Bachelor"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="employer">
+                Public employer label <span className="font-normal text-[#98A2B3]">(optional)</span>
+              </label>
+              <input
+                id="employer"
+                className="cj-input"
+                value={form.public_employer_label}
+                onChange={(e) => setField('public_employer_label', e.target.value)}
+                placeholder="e.g. Hotel in Lakeside — leave blank to hide"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="desc">
+                About this role
+              </label>
+              <textarea
+                id="desc"
+                className="cj-input min-h-[88px] py-2.5"
+                rows={3}
+                value={form.description}
+                onChange={(e) => setField('description', e.target.value)}
+                placeholder="Short description for candidates"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="req">
+                Requirements
+              </label>
+              <textarea
+                id="req"
+                className="cj-input min-h-[72px] py-2.5"
+                rows={2}
+                value={form.requirements}
+                onChange={(e) => setField('requirements', e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="resp">
+                Responsibilities
+              </label>
+              <textarea
+                id="resp"
+                className="cj-input min-h-[72px] py-2.5"
+                rows={2}
+                value={form.responsibilities}
+                onChange={(e) => setField('responsibilities', e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="cj-label" htmlFor="ben">
+                Benefits
+              </label>
+              <textarea
+                id="ben"
+                className="cj-input min-h-[64px] py-2.5"
+                rows={2}
+                value={form.benefits}
+                onChange={(e) => setField('benefits', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 items-center text-sm">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.publish}
+                onChange={(e) => setField('publish', e.target.checked)}
+                className="rounded border-[#D0D7E2]"
+              />
+              <span className="text-[#0B1220] font-medium">Publish immediately</span>
+            </label>
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.is_featured}
+                onChange={(e) => setField('is_featured', e.target.checked)}
+                className="rounded border-[#D0D7E2]"
+              />
+              <span className="text-[#0B1220] font-medium">Feature on homepage</span>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button type="submit" loading={creating} disabled={creating}>
+              {form.publish ? 'Create & publish' : 'Save as draft'}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowCreate(false);
+                setForm(emptyForm);
+                setFormError(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      )}
 
       <div className="flex flex-wrap gap-2 mb-4">
         <Button size="sm" variant="outline" disabled={bulkBusy || badCount === 0} onClick={bulkClearBadSalaries}>
@@ -202,7 +530,15 @@ export default function JobsPage() {
 
       {loading && <p className="text-sm text-[#6B7789]">Loading…</p>}
       {!loading && jobs.length === 0 && (
-        <EmptyState title="No jobs in this filter" description="Try another status or publish a hiring request." />
+        <EmptyState
+          title="No jobs in this filter"
+          description="Create a vacancy above, or publish from a hiring request."
+          action={
+            <Button size="sm" onClick={() => setShowCreate(true)}>
+              <Plus className="w-3.5 h-3.5" aria-hidden /> Create job
+            </Button>
+          }
+        />
       )}
 
       <div className="space-y-3">
