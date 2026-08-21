@@ -62,3 +62,109 @@ export function formatPlaceName(raw?: string | null): string {
   }
   return s;
 }
+
+/** Job type labels for display */
+const JOB_TYPE_LABELS: Record<string, string> = {
+  'full-time': 'Full-time',
+  'part-time': 'Part-time',
+  contract: 'Contract',
+  internship: 'Internship',
+  temporary: 'Temporary',
+  freelance: 'Freelance',
+};
+
+export function formatJobType(raw?: string | null): string {
+  if (!raw) return '';
+  const key = raw.trim().toLowerCase().replace(/\s+/g, '-');
+  if (JOB_TYPE_LABELS[key]) return JOB_TYPE_LABELS[key];
+  // Fallback: title-case with hyphen normalized
+  return raw
+    .trim()
+    .replace(/-/g, ' ')
+    .split(/\s+/)
+    .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''))
+    .join('-')
+    .replace(/- /g, '-');
+}
+
+/**
+ * Professional salary chip. Hides nonsense migrated values.
+ * Returns null when salary should not be shown.
+ */
+export function formatSalaryDisplay(
+  salaryDisplay?: string | null,
+  salaryMin?: number | null,
+  salaryMax?: number | null,
+): string | null {
+  const min = salaryMin != null && Number.isFinite(Number(salaryMin)) ? Number(salaryMin) : null;
+  const max = salaryMax != null && Number.isFinite(Number(salaryMax))
+    ? Number(salaryMax)
+    : null;
+
+  // Prefer numeric fields when present
+  if (min != null || max != null) {
+    // Reject absurd / placeholder ranges (common in bad migrations)
+    const vals = [min, max].filter((v): v is number => v != null);
+    if (vals.some((v) => v < 1000)) return null; // e.g. 1–2
+    if (vals.every((v) => v === 0)) return null;
+    if (min != null && max != null && min === max) {
+      if (min < 1000) return null;
+      return `NPR ${min.toLocaleString('en-NP')}`;
+    }
+    if (min != null && max != null) {
+      const lo = Math.min(min, max);
+      const hi = Math.max(min, max);
+      if (hi < 1000) return null;
+      return `NPR ${lo.toLocaleString('en-NP')}–${hi.toLocaleString('en-NP')}`;
+    }
+    if (min != null && min >= 1000) return `NPR ${min.toLocaleString('en-NP')}+`;
+    if (max != null && max >= 1000) return `Up to NPR ${max.toLocaleString('en-NP')}`;
+  }
+
+  // Fallback: parse salary_display string
+  const raw = (salaryDisplay || '').trim();
+  if (!raw) return null;
+
+  // Extract numbers
+  const nums = raw.replace(/,/g, '').match(/\d+/g)?.map(Number) || [];
+  if (nums.length && nums.every((n) => n < 1000)) return null;
+  if (nums.length === 2 && nums[0] === nums[1] && nums[0] >= 1000) {
+    return `NPR ${nums[0].toLocaleString('en-NP')}`;
+  }
+  if (nums.length >= 2) {
+    const lo = Math.min(nums[0], nums[1]);
+    const hi = Math.max(nums[0], nums[1]);
+    if (hi < 1000) return null;
+    return `NPR ${lo.toLocaleString('en-NP')}–${hi.toLocaleString('en-NP')}`;
+  }
+  if (nums.length === 1 && nums[0] >= 1000) {
+    return `NPR ${nums[0].toLocaleString('en-NP')}`;
+  }
+
+  // Non-numeric phrases like "Negotiable"
+  const lower = raw.toLowerCase();
+  if (lower.includes('negotiable') || lower.includes('competitive')) return raw;
+  // If string looks like garbage, hide
+  if (/^npr\s*0/i.test(raw)) return null;
+  return raw;
+}
+
+/**
+ * Only show employer label when it is a real public name, not a generic badge.
+ */
+export function formatEmployerLabel(raw?: string | null): string | null {
+  const s = (raw || '').trim();
+  if (!s) return null;
+  const generic = [
+    'verified employer',
+    'verified',
+    'employer',
+    'confidential',
+    'n/a',
+    'na',
+    'unknown',
+    'company',
+  ];
+  if (generic.includes(s.toLowerCase())) return null;
+  return s;
+}

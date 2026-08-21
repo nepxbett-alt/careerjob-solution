@@ -1,5 +1,5 @@
 import { formatJobLocation } from '../lib/formatLocation';
-import { formatJobTitle } from '../lib/formatText';
+import { formatJobTitle, formatSalaryDisplay, formatJobType, formatEmployerLabel } from '../lib/formatText';
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, ArrowLeft, Bookmark, BookmarkCheck } from 'lucide-react';
@@ -104,6 +104,10 @@ export default function JobDetailPage() {
   }
 
   const locationLabel = formatJobLocation(job.location, job.location_detail, { cityHint: 'Pokhara' }) || job.location;
+  const displayTitle = formatJobTitle(job.title) || job.title;
+  const displaySalary = formatSalaryDisplay(job.salary_display, job.salary_min, job.salary_max);
+  const displayType = formatJobType(job.job_type);
+  const displayEmployer = formatEmployerLabel(job.public_employer_label);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://careerjobsolution.com.np';
   const canonical = `${origin}/jobs/${job.id}`;
@@ -133,7 +137,7 @@ export default function JobDetailPage() {
   return (
     <div className="cj-container max-w-3xl py-8 pb-28 md:pb-12">
       <Seo
-        title={`${job.title} in ${job.location} | CareerJob Solution`}
+        title={`${displayTitle} in ${locationLabel || job.location} | CareerJob Solution`}
         description={desc}
         canonical={canonical}
         jsonLd={jsonLd}
@@ -143,9 +147,9 @@ export default function JobDetailPage() {
       </Link>
 
       <header className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#0B1220] tracking-tight mb-3">{formatJobTitle(job.title) || job.title}</h1>
-        {job.public_employer_label && (
-          <p className="text-[#6B7789] mb-3">{job.public_employer_label}</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-[#0B1220] tracking-tight mb-3">{displayTitle}</h1>
+        {displayEmployer && (
+          <p className="text-[#6B7789] mb-3">{displayEmployer}</p>
         )}
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#3D4A5C]">
           <span className="inline-flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#98A2B3]" aria-hidden />{locationLabel}</span>
@@ -157,10 +161,10 @@ export default function JobDetailPage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mt-4">
-          {job.salary_display && (
-            <span className="font-medium bg-[#EEF2F7] text-[#0B1220] px-3 py-1 rounded-lg text-sm">{job.salary_display}</span>
+          {displaySalary && (
+            <span className="font-medium bg-[#EEF2F7] text-[#0B1220] px-3 py-1 rounded-lg text-sm">{displaySalary}</span>
           )}
-          <span className="bg-[#F7F9FC] text-[#3D4A5C] px-3 py-1 rounded-lg text-sm capitalize">{job.job_type.replace('-', ' ')}</span>
+          <span className="bg-[#F7F9FC] text-[#3D4A5C] px-3 py-1 rounded-lg text-sm capitalize">{displayType || job.job_type}</span>
           {job.experience_required && (
             <span className="bg-[#F7F9FC] text-[#3D4A5C] px-3 py-1 rounded-lg text-sm">{job.experience_required}</span>
           )}
