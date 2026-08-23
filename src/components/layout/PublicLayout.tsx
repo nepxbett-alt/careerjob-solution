@@ -170,32 +170,45 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-slate-200 bg-slate-50">
-        <div className="cj-container py-10 grid sm:grid-cols-3 gap-8 text-sm">
+      <footer className="border-t border-[#E8ECF1] bg-[#F7F9FC]">
+        <div className="cj-container py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
           <div>
             <BrandLogo size="sm" className="mb-3" />
-            <p className="text-slate-600 leading-relaxed text-[0.9rem]">
-              Recruitment agency for Pokhara and Nepal. We connect people with work — and businesses with people.
+            <p className="text-[#3D4A5C] leading-relaxed text-[0.9rem]">
+              Pokhara&apos;s local job &amp; hiring platform. Find work, build your profile, connect with employers.
             </p>
+            <p className="text-xs text-[#6B7789] mt-3">{CONTACT.address}</p>
+            <p className="text-xs text-[#6B7789]">Phone: {CONTACT.phones.join(' / ')}</p>
           </div>
           <div>
-            <div className="font-semibold text-slate-900 mb-2">Contact</div>
-            <p className="text-slate-600">{CONTACT.address}</p>
-            <p className="text-slate-600 mt-1">Phone: {CONTACT.phones.join(' / ')}</p>
-            <p className="text-slate-600">Email: {CONTACT.email}</p>
+            <div className="font-semibold text-[#0B1220] mb-2">Jobseekers</div>
+            <div className="space-y-1.5 text-[#3D4A5C]">
+              <Link to="/jobs" className="block hover:text-[#0066FF]">Find Jobs</Link>
+              <Link to="/register" className="block hover:text-[#0066FF]">Create Profile</Link>
+              <Link to="/candidate/cv" className="block hover:text-[#0066FF]">Create CV</Link>
+              <Link to="/candidate/applications" className="block hover:text-[#0066FF]">My Applications</Link>
+            </div>
           </div>
           <div>
-            <div className="font-semibold text-slate-900 mb-2">Explore</div>
-            <div className="space-y-1.5">
-              <Link to="/jobs" className="block text-slate-600 hover:text-[#0066FF]">Jobs</Link>
-              <Link to="/for-businesses" className="block text-slate-600 hover:text-[#0066FF]">Hire staff</Link>
-              <Link to="/how-it-works" className="block text-slate-600 hover:text-[#0066FF]">How it works</Link>
-              <Link to="/privacy" className="block text-slate-600 hover:text-[#0066FF]">Privacy</Link>
-              <Link to="/terms" className="block text-slate-600 hover:text-[#0066FF]">Terms</Link>
+            <div className="font-semibold text-[#0B1220] mb-2">Employers</div>
+            <div className="space-y-1.5 text-[#3D4A5C]">
+              <Link to="/for-businesses" className="block hover:text-[#0066FF]">Post a Job</Link>
+              <Link to="/for-businesses" className="block hover:text-[#0066FF]">Find Candidates</Link>
+              <Link to="/login" className="block hover:text-[#0066FF]">Employer Login</Link>
+            </div>
+          </div>
+          <div>
+            <div className="font-semibold text-[#0B1220] mb-2">Company</div>
+            <div className="space-y-1.5 text-[#3D4A5C]">
+              <Link to="/about" className="block hover:text-[#0066FF]">About CareerJob</Link>
+              <Link to="/contact" className="block hover:text-[#0066FF]">Contact</Link>
+              <Link to="/how-it-works" className="block hover:text-[#0066FF]">How it works</Link>
+              <Link to="/privacy" className="block hover:text-[#0066FF]">Privacy</Link>
+              <Link to="/terms" className="block hover:text-[#0066FF]">Terms</Link>
             </div>
           </div>
         </div>
-        <div className="cj-container pb-8 pt-2 border-t border-slate-200/80 text-center text-xs text-slate-500">
+        <div className="cj-container pb-8 pt-2 border-t border-[#E8ECF1] text-center text-xs text-[#6B7789]">
           © {new Date().getFullYear()} CareerJob Solution · Pokhara, Nepal
         </div>
       </footer>
