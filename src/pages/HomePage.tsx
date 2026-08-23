@@ -115,26 +115,36 @@ export default function HomePage() {
         canonical="https://careerjobsolution.com.np/"
       />
 
-      {/* Hero + search */}
+      {/* Hero */}
       <section className="relative border-b border-[#E8ECF1] bg-white overflow-hidden">
         <div
-          className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(0,102,255,0.07),transparent_55%)]"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 90% 70% at 50% -15%, rgba(0,102,255,0.10), transparent 55%), linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 55%)',
+          }}
           aria-hidden
         />
-        <div className="cj-container relative max-w-3xl pt-9 pb-7 md:pt-12 md:pb-10">
-          <p className="text-center text-xs font-semibold uppercase tracking-wide text-[#0066FF] mb-2">
-            CareerJob Solution · Pokhara
-          </p>
-          <h1 className="text-2xl sm:text-3xl md:text-[2.15rem] font-bold tracking-tight text-[#0B1220] text-center mb-2">
-            Find your next job in Nepal
+        <div className="cj-container relative max-w-3xl pt-11 pb-9 md:pt-16 md:pb-12">
+          <div className="flex justify-center mb-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E8ECF1] bg-white/90 px-3 py-1.5 text-xs font-medium text-[#3D4A5C] shadow-sm">
+              <MapPin className="w-3.5 h-3.5 text-[#0066FF]" aria-hidden />
+              Pokhara · Nepal
+            </span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold tracking-tight text-[#0B1220] text-center mb-3 leading-[1.15]">
+            Find your next job
+            <span className="block text-[#0066FF]">in Pokhara</span>
           </h1>
-          <p className="text-sm sm:text-[0.95rem] text-[#6B7789] text-center mb-6 max-w-md mx-auto leading-relaxed">
-            Browse real openings by category and area. See salary and requirements — apply in minutes.
+          <p className="text-base sm:text-lg text-[#3D4A5C] text-center mb-7 max-w-lg mx-auto leading-relaxed">
+            Real local openings with salary, location and requirements.
+            Apply in minutes — CareerJob reviews every application.
           </p>
 
           <form
             onSubmit={handleSearch}
-            className="relative max-w-xl mx-auto"
+            className="relative max-w-xl mx-auto mb-4"
             role="search"
           >
             <label htmlFor="home-search" className="sr-only">
@@ -150,27 +160,51 @@ export default function HomePage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search job title, skill, or company…"
-              className="w-full h-12 sm:h-[3.25rem] pl-12 pr-4 rounded-2xl border border-[#E8ECF1] bg-white text-[#0B1220] placeholder:text-[#98A2B3] shadow-[0_4px_24px_rgba(11,18,32,0.06)] focus:outline-none focus:ring-2 focus:ring-[#0066FF]/25 focus:border-[#0066FF]/40 transition-shadow"
+              className="w-full h-12 sm:h-14 pl-12 pr-28 rounded-2xl border border-[#E8ECF1] bg-white text-[#0B1220] placeholder:text-[#98A2B3] shadow-[0_8px_30px_rgba(0,102,255,0.08)] focus:outline-none focus:ring-2 focus:ring-[#0066FF]/30 focus:border-[#0066FF]/50 transition-shadow text-[15px]"
               autoComplete="off"
               enterKeyHint="search"
             />
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-10 sm:h-11 px-4 rounded-xl bg-[#0066FF] text-white text-sm font-semibold hover:bg-[#0052CC] transition-colors min-h-[44px]"
+            >
+              Search
+            </button>
           </form>
 
+          <div className="flex flex-wrap justify-center gap-2 mb-5">
+            <Link to="/jobs">
+              <Button size="lg" className="rounded-xl">
+                <Briefcase className="w-4 h-4" aria-hidden />
+                Browse all jobs
+                {jobCount != null && jobCount > 0 ? ` (${jobCount})` : ''}
+              </Button>
+            </Link>
+            <Link to={user ? '/candidate/profile' : '/register'}>
+              <Button size="lg" variant="outline" className="rounded-xl">
+                Create profile
+              </Button>
+            </Link>
+          </div>
+
           {jobCount != null && jobCount > 0 && (
-            <p className="text-center text-sm text-[#6B7789] mt-3 tabular-nums">
-              <span className="font-semibold text-[#0B1220]">{jobCount}</span> open roles right now
+            <p className="text-center text-sm text-[#6B7789] tabular-nums">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden />
+                <span className="font-semibold text-[#0B1220]">{jobCount}</span> open roles available now
+              </span>
             </p>
           )}
 
           {quickTerms.length > 0 && (
             <div className="flex flex-wrap justify-center gap-1.5 mt-4">
-              {quickTerms.map((t) => (
+              {quickTerms.map((term) => (
                 <Link
-                  key={t.to}
-                  to={t.to}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#F7F9FC] border border-[#E8ECF1] text-[#3D4A5C] hover:border-[#0066FF]/40 hover:text-[#0066FF] transition-colors"
+                  key={term.to}
+                  to={term.to}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E8ECF1] text-[#3D4A5C] hover:border-[#0066FF]/40 hover:text-[#0066FF] transition-colors"
                 >
-                  {t.label}
+                  {term.label}
                 </Link>
               ))}
             </div>
