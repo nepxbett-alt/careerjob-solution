@@ -181,12 +181,14 @@ export default function PublicLayout() {
             <p className="text-xs text-[#6B7789]">Phone: {CONTACT.phones.join(' / ')}</p>
           </div>
           <div>
-            <div className="font-semibold text-[#0B1220] mb-2">Jobseekers</div>
+            <div className="font-semibold text-[#0B1220] mb-2">Browse</div>
             <div className="space-y-1.5 text-[#3D4A5C]">
               <Link to="/jobs" className="block hover:text-[#0066FF]">Find Jobs</Link>
-              <Link to="/register" className="block hover:text-[#0066FF]">Create Profile</Link>
+              <Link to="/#categories" className="block hover:text-[#0066FF]">Categories</Link>
+              <Link to="/#locations" className="block hover:text-[#0066FF]">Locations</Link>
               <Link to="/candidate/cv" className="block hover:text-[#0066FF]">Create CV</Link>
               <Link to="/candidate/applications" className="block hover:text-[#0066FF]">My Applications</Link>
+              <Link to="/candidate/profile" className="block hover:text-[#0066FF]">My Profile</Link>
             </div>
           </div>
           <div>
