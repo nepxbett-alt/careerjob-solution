@@ -61,7 +61,7 @@ export default function PublicLayout() {
   const nav = [
     { to: '/', label: t('nav_home') },
     { to: '/jobs', label: t('nav_jobs') },
-    { to: '/for-businesses', label: t('nav_business') },
+    { to: '/candidate/cv', label: 'CV Builder' },
     { to: '/how-it-works', label: t('nav_how') },
     { to: '/contact', label: t('nav_contact') },
   ];
@@ -192,9 +192,9 @@ export default function PublicLayout() {
           <div>
             <div className="font-semibold text-[#0B1220] mb-2">Employers</div>
             <div className="space-y-1.5 text-[#3D4A5C]">
-              <Link to="/for-businesses" className="block hover:text-[#0066FF]">Post a Job</Link>
-              <Link to="/for-businesses" className="block hover:text-[#0066FF]">Find Candidates</Link>
-              <Link to="/login" className="block hover:text-[#0066FF]">Employer Login</Link>
+              <Link to="/contact" className="block hover:text-[#0066FF]">Contact CareerJob to hire</Link>
+              <Link to="/about" className="block hover:text-[#0066FF]">About our agency</Link>
+              <a href={`https://wa.me/${CONTACT.whatsapp}`} className="block hover:text-[#0066FF]" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
           </div>
           <div>

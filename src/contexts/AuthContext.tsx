@@ -55,10 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const metaPhone = authUser.user_metadata.phone as string | undefined;
       const updates: { role?: Role; full_name?: string; phone?: string } = {};
 
-      if (metaRole && VALID_ROLES.includes(metaRole as Role) && p.role === 'candidate' && metaRole !== 'candidate') {
-        // only elevate from default candidate → business (never auto-elevate to admin)
-        if (metaRole === 'business') updates.role = 'business';
-      }
+      // Public registration is candidate-only. Staff roles are assigned by admins in the database.
+      // Do not auto-elevate anyone to business or admin from client metadata.
       if (metaName && !p.full_name) updates.full_name = metaName;
       if (metaPhone && !p.phone) updates.phone = metaPhone;
 

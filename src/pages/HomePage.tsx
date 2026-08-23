@@ -137,10 +137,6 @@ export default function HomePage() {
   };
 
   const isCandidate = profile?.role === 'candidate';
-  const isStaff =
-    profile?.role &&
-    ['owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role);
-
   return (
     <div>
       <Seo
@@ -593,49 +589,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 12. Employers */}
-      <section className="py-12 border-b border-[#E8ECF1] bg-[#F7F9FC]">
-        <div className="cj-container max-w-3xl">
-          <h2 className="text-xl font-bold tracking-tight text-[#0B1220] text-center mb-2">
-            {lang === 'ne' ? 'पोखरामा भर्ती गर्दै हुनुहुन्छ?' : 'Hiring in Pokhara?'}
-          </h2>
-          <p className="text-sm text-[#6B7789] text-center mb-6 max-w-md mx-auto">
-            {lang === 'ne'
-              ? 'योग्य उम्मेदवार खोज्नुहोस् र भर्ती एकै ठाउँमा व्यवस्थापन गर्नुहोस्।'
-              : 'Find qualified candidates from Pokhara and manage recruitment in one place.'}
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-            {[
-              { n: '1', t: 'Post', d: 'Publish your vacancy' },
-              { n: '2', t: 'Discover', d: 'Find suitable candidates' },
-              { n: '3', t: 'Shortlist', d: 'Review applications' },
-              { n: '4', t: 'Hire', d: 'Manage the process' },
-            ].map((s) => (
-              <div key={s.n} className="rounded-xl border border-[#E8ECF1] bg-white p-3 text-center">
-                <div className="w-7 h-7 rounded-full bg-[#0066FF] text-white text-xs font-bold flex items-center justify-center mx-auto mb-2">
-                  {s.n}
-                </div>
-                <div className="text-sm font-semibold text-[#0B1220]">{s.t}</div>
-                <div className="text-[11px] text-[#6B7789] mt-0.5">{s.d}</div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            <Link to="/for-businesses">
-              <Button size="lg" className="rounded-xl">
-                {lang === 'ne' ? 'जागिर पोस्ट गर्नुहोस्' : 'Post a Job'}
-              </Button>
-            </Link>
-            <Link to={isStaff ? '/admin/candidates' : '/for-businesses'}>
-              <Button size="lg" variant="outline" className="rounded-xl">
-                {lang === 'ne' ? 'उम्मेदवार खोज्नुहोस्' : 'Find Candidates'}
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* 15. Why CareerJob */}
+
       <section className="py-12 border-b border-[#E8ECF1] bg-white">
         <div className="cj-container max-w-3xl">
           <h2 className="text-xl font-bold tracking-tight text-[#0B1220] text-center mb-6">
@@ -696,11 +651,6 @@ export default function HomePage() {
             <Link to="/register">
               <Button size="lg" variant="outline" className="rounded-xl !border-white/30 !text-white hover:!bg-white/10">
                 {lang === 'ne' ? 'प्रोफाइल' : 'Create Your Profile'}
-              </Button>
-            </Link>
-            <Link to="/for-businesses">
-              <Button size="lg" variant="outline" className="rounded-xl !border-white/30 !text-white hover:!bg-white/10">
-                {lang === 'ne' ? 'जागिर पोस्ट' : 'Post a Job'}
               </Button>
             </Link>
           </div>

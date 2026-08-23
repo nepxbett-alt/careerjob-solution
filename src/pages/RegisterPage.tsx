@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { cn } from '../lib/cn';
 
 export default function RegisterPage() {
-  const [role, setRole] = useState<'candidate' | 'business'>('candidate');
+  const role = 'candidate' as const;
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -28,11 +28,11 @@ export default function RegisterPage() {
         options: {
           data: {
             full_name: fullName.trim(),
-            role,
+            role: 'candidate',
             phone: phone.trim(),
           },
           emailRedirectTo:
-            window.location.origin + (role === 'business' ? '/business' : '/candidate/profile'),
+            window.location.origin + '/candidate/profile',
         },
       });
       if (otpError) throw otpError;
@@ -66,31 +66,9 @@ export default function RegisterPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div>
-              <span className="cj-label" id="role-label">I am a</span>
-              <div className="flex gap-1 p-1 bg-slate-100 rounded-xl" role="group" aria-labelledby="role-label">
-                <button
-                  type="button"
-                  onClick={() => setRole('candidate')}
-                  className={cn(
-                    'flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]',
-                    role === 'candidate' ? 'bg-white shadow text-[#0066FF]' : 'text-slate-600'
-                  )}
-                >
-                  Job seeker
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('business')}
-                  className={cn(
-                    'flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]',
-                    role === 'business' ? 'bg-white shadow text-[#0066FF]' : 'text-slate-600'
-                  )}
-                >
-                  Business
-                </button>
-              </div>
-            </div>
+            <p className="text-sm text-slate-600 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5">
+              Create a free <strong className="text-slate-800">job seeker</strong> account to save jobs, build your CV, and track applications.
+            </p>
 
             <div>
               <label htmlFor="reg-name" className="cj-label">Full name</label>

@@ -19,8 +19,8 @@ const FAQS = [
     a: 'Employer contact is coordinated by CareerJob. Public job listings do not show private employer numbers, and we do not freely share your private details without the recruitment process.',
   },
   {
-    q: 'I am a business. How do I hire?',
-    a: 'Register as Business, submit a hiring request, and our team will review it, recruit, and coordinate interviews.',
+    q: 'I am an employer. How do I hire through CareerJob?',
+    a: 'Contact CareerJob by phone, WhatsApp, or visit our office. Our staff manage hiring — there is no public employer self-service portal.',
   },
   {
     q: 'Where is your office?',
