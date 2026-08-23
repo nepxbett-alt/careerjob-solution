@@ -9,7 +9,7 @@
 
 ## Overall status
 
-**NOT FULLY HANDOVER-READY until Edge Function is redeployed and verified.**
+**Nearly ready:** anonymous apply uses Vercel `/api/public-apply` when `SUPABASE_SERVICE_ROLE_KEY` is set on Vercel. Edge Function remains optional fallback.
 
 | Area | Status | Notes |
 |------|--------|--------|
@@ -132,8 +132,9 @@ See `.env.example`.
 
 ### P0
 
-1. **Redeploy `public-job-application`** and confirm E2E apply returns a reference  
-2. Confirm Edge secrets: `SUPABASE_SERVICE_ROLE_KEY` present  
+1. **Set Vercel env** `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (server-only) so `/api/public-apply` works  
+2. **Optional:** Redeploy Edge Function `public-job-application` as fallback  
+3. Smoke-test anonymous apply → reference → Admin applications  
 
 ### P1
 
