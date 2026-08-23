@@ -73,6 +73,11 @@ export function JobCard({ job }: { job: Job }) {
             )}
           </div>
         )}
+        {(job.education_required || job.experience_required) && (
+          <p className="text-[12px] text-[#6B7789] mt-2.5 truncate">
+            {[job.education_required, job.experience_required].filter(Boolean).join(' · ')}
+          </p>
+        )}
       </Link>
 
       <div className="flex items-center justify-between gap-2 px-4 sm:px-5 py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC]">

@@ -59,10 +59,10 @@ export default function PublicLayout() {
   const { t } = useI18n();
 
   const nav = [
-    { to: '/', label: t('nav_home') },
-    { to: '/jobs', label: t('nav_jobs') },
-    { to: '/candidate/cv', label: 'CV Builder' },
-    { to: '/how-it-works', label: t('nav_how') },
+    { to: '/jobs', label: 'Jobs' },
+    { to: '/#categories', label: 'Categories' },
+    { to: '/#areas', label: 'Locations' },
+    { to: '/candidate/cv', label: 'CV' },
     { to: '/contact', label: t('nav_contact') },
   ];
 
@@ -175,7 +175,7 @@ export default function PublicLayout() {
           <div>
             <BrandLogo size="sm" className="mb-3" />
             <p className="text-[#3D4A5C] leading-relaxed text-[0.9rem]">
-              Pokhara&apos;s local job &amp; hiring platform. Find work, build your profile, connect with employers.
+              Find jobs. Build your career.
             </p>
             <p className="text-xs text-[#6B7789] mt-3">{CONTACT.address}</p>
             <p className="text-xs text-[#6B7789]">Phone: {CONTACT.phones.join(' / ')}</p>
