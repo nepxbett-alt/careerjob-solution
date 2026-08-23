@@ -12,8 +12,8 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading…
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F9FC]" aria-busy="true">
+        <p className="text-sm text-[#6B7789]">Loading…</p>
       </div>
     );
   }
@@ -22,11 +22,22 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile && !allowedRoles.includes(profile.role)) {
-    // redirect to appropriate home
+  // Wait for profile before role gate (avoids flash redirect)
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F9FC]" aria-busy="true">
+        <p className="text-sm text-[#6B7789]">Loading your account…</p>
+      </div>
+    );
+  }
+
+  if (!allowedRoles.includes(profile.role)) {
     if (profile.role === 'candidate') return <Navigate to="/candidate" replace />;
     if (profile.role === 'business') return <Navigate to="/business" replace />;
-    return <Navigate to="/admin" replace />;
+    if (['owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role)) {
+      return <Navigate to="/admin" replace />;
+    }
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
