@@ -26,8 +26,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const VALID_ROLES: Role[] = ['candidate', 'business', 'owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -50,13 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Sync role / name from auth metadata on first login (register chose candidate or business)
     if (p && authUser?.user_metadata) {
-      const metaRole = authUser.user_metadata.role as string | undefined;
       const metaName = authUser.user_metadata.full_name as string | undefined;
       const metaPhone = authUser.user_metadata.phone as string | undefined;
-      const updates: { role?: Role; full_name?: string; phone?: string } = {};
+      const updates: { full_name?: string; phone?: string } = {};
 
       // Public registration is candidate-only. Staff roles are assigned by admins in the database.
-      // Do not auto-elevate anyone to business or admin from client metadata.
       if (metaName && !p.full_name) updates.full_name = metaName;
       if (metaPhone && !p.phone) updates.phone = metaPhone;
 

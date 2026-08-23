@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { BRAND } from '../lib/config';
 import { supabase } from '../lib/supabase';
-import { cn } from '../lib/cn';
 
 export default function RegisterPage() {
-  const role = 'candidate' as const;
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');

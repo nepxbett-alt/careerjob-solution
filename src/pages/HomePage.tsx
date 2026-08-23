@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ArrowRight, MapPin, Briefcase, FileText } from 'lucide-react';
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { FormEvent } from 'react';
 import { Button } from '../components/ui/Button';
 import {
   searchJobs,

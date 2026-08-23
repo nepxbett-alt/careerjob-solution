@@ -3,7 +3,7 @@ import { Seo } from '../components/Seo';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { CONTACT } from '../lib/config';
-import { Building2, Phone, MessageCircle } from 'lucide-react';
+import { Building2, Phone } from 'lucide-react';
 
 /**
  * Employers do not self-serve on CareerJob.
