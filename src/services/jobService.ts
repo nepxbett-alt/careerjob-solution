@@ -356,8 +356,8 @@ export async function getHospitalityJobs(limit = 6): Promise<Job[]> {
     .in('slug', ['hotel-restaurant', 'hospitality']);
   const ids = (cats || []).map((c) => c.id);
   if (!ids.length) {
-    const { data } = await searchJobs({ q: 'waiter', page: 1, limit });
-    return data.jobs;
+    const res = await searchJobs({ q: 'waiter', page: 1, limit });
+    return res.jobs;
   }
   let q = supabase
     .from('jobs')

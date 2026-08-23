@@ -48,7 +48,7 @@ async function fetchAll(
       .order(orderCol, { ascending: false })
       .range(from, to);
     if (error) throw error;
-    const batch = (data || []) as Record<string, unknown>[];
+    const batch = (data || []) as unknown as Record<string, unknown>[];
     out.push(...batch);
     if (batch.length < pageSize) break;
     from += pageSize;
