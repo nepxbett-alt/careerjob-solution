@@ -39,6 +39,7 @@ const emptyForm = {
   requirements: '',
   benefits: '',
   public_employer_label: '',
+  application_deadline: '',
   is_featured: false,
   publish: true,
 };
@@ -211,6 +212,7 @@ export default function JobsPage() {
         requirements: form.requirements || null,
         benefits: form.benefits || null,
         public_employer_label: form.public_employer_label || null,
+        application_deadline: form.application_deadline || null,
         is_featured: form.is_featured,
         publish: form.publish,
         created_by: user?.id || null,
@@ -276,6 +278,33 @@ export default function JobsPage() {
               For walk-in employers or roles CareerJob posts directly. No business account required.
             </p>
           </div>
+
+          {form.title.trim() && (
+            <div className="rounded-2xl border border-dashed border-[#0066FF]/40 bg-[#F7F9FC] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#0066FF] mb-2">Public preview</p>
+              <p className="font-bold text-[#0B1220] text-lg">{form.title.trim()}</p>
+              {form.public_employer_label && (
+                <p className="text-sm text-[#6B7789] mt-0.5">{form.public_employer_label}</p>
+              )}
+              <p className="text-sm text-[#3D4A5C] mt-1">
+                {[form.location_detail || 'Pokhara', form.job_type, form.experience_required].filter(Boolean).join(' · ')}
+              </p>
+              {(form.salary_min || form.salary_max) && (
+                <p className="text-sm font-medium text-[#0B1220] mt-1">
+                  NPR {[form.salary_min, form.salary_max].filter(Boolean).join('–')}
+                </p>
+              )}
+              {form.description && (
+                <p className="text-sm text-[#3D4A5C] mt-2 line-clamp-3 whitespace-pre-wrap">{form.description}</p>
+              )}
+              {form.application_deadline && (
+                <p className="text-xs text-amber-800 mt-2">Deadline: {form.application_deadline}</p>
+              )}
+              <p className="text-[11px] text-[#98A2B3] mt-2">
+                {form.publish ? 'Will appear on public jobs when published.' : 'Saved as draft — not public.'}
+              </p>
+            </div>
+          )}
 
           {formError && (
             <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -386,6 +415,19 @@ export default function JobsPage() {
                 value={form.education_required}
                 onChange={(e) => setField('education_required', e.target.value)}
                 placeholder="e.g. +2, Bachelor"
+              />
+            </div>
+
+            <div>
+              <label className="cj-label" htmlFor="deadline">
+                Application deadline
+              </label>
+              <input
+                id="deadline"
+                type="date"
+                className="cj-input"
+                value={form.application_deadline}
+                onChange={(e) => setField('application_deadline', e.target.value)}
               />
             </div>
 

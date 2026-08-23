@@ -10,6 +10,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Seo } from '../components/Seo';
 import { POKHARA_AREAS, JOB_TYPES } from '../lib/config';
 import { cn } from '../lib/cn';
+import { FilterBottomSheet } from '../components/FilterBottomSheet';
 
 export default function JobsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -262,6 +263,22 @@ export default function JobsPage() {
           </div>
         )}
       </div>
+
+      <FilterBottomSheet
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        area={area}
+        jobType={jobType}
+        onApply={({ area: a, type: ty }) => {
+          updateParams({
+            q: q || undefined,
+            area: a,
+            type: ty,
+            category: category || undefined,
+          });
+        }}
+        onClear={clearAll}
+      />
     </div>
   );
 }

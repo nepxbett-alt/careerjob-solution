@@ -158,6 +158,7 @@ export interface AdminCreateJobInput {
   benefits?: string | null;
   public_employer_label?: string | null;
   is_featured?: boolean;
+  application_deadline?: string | null;
   /** If true: status published + approved + published_at */
   publish?: boolean;
   created_by?: string | null;
@@ -210,6 +211,7 @@ export async function createAdminJob(input: AdminCreateJobInput) {
     benefits: (input.benefits || '').trim() || null,
     public_employer_label: (input.public_employer_label || '').trim() || null,
     is_featured: !!input.is_featured,
+    application_deadline: (input.application_deadline || '').trim() || null,
     status: publish ? 'published' : 'draft',
     approved_by_agency: publish,
     published_at: publish ? new Date().toISOString() : null,
