@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Briefcase, Users, ArrowRight, Shield, MessageCircle, FileText, MapPin } from 'lucide-react';
+import { Briefcase, Users, ArrowRight, Shield, MessageCircle, FileText, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
@@ -119,7 +119,6 @@ export default function HomePage() {
             <form onSubmit={handleSearch} className="mb-6" role="search">
               <div className="flex gap-2 p-1.5 bg-white rounded-2xl border border-[#E8ECF1] shadow-[0_8px_28px_rgba(0,102,255,0.07)] text-left">
                 <div className="flex-1 relative min-w-0">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#98A2B3] pointer-events-none" aria-hidden />
                   <label htmlFor="home-search" className="sr-only">Search jobs</label>
                   <input
                     id="home-search"
@@ -127,7 +126,7 @@ export default function HomePage() {
                     placeholder="Job title or skill…"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full h-11 pl-11 pr-3 rounded-xl border-0 bg-transparent text-[0.95rem] focus:outline-none focus:ring-0"
+                    className="w-full h-11 px-4 rounded-xl border-0 bg-transparent text-[0.95rem] focus:outline-none focus:ring-0"
                     autoComplete="off"
                   />
                 </div>

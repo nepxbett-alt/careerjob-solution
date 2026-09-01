@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { searchJobs } from '../services/jobService';
 import type { Job } from '../services/jobService';
 import { Button } from '../components/ui/Button';
@@ -83,7 +83,6 @@ export default function JobsPage() {
         <div className="cj-container max-w-3xl py-3 sm:py-4">
           <form onSubmit={handleSearch} className="flex gap-2" role="search">
             <div className="flex-1 relative min-w-0">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#98A2B3] pointer-events-none" aria-hidden />
               <label htmlFor="jobs-q" className="sr-only">Search jobs in Pokhara</label>
               <input
                 id="jobs-q"
@@ -91,7 +90,7 @@ export default function JobsPage() {
                 defaultValue={q}
                 key={q}
                 placeholder="Job title or skill in Pokhara"
-                className="cj-input pl-11 h-12 rounded-xl bg-white shadow-sm"
+                className="cj-input px-3 h-12 rounded-xl bg-white shadow-sm"
                 autoComplete="off"
               />
             </div>

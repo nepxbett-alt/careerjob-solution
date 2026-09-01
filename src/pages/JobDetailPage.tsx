@@ -366,6 +366,7 @@ export default function JobDetailPage() {
         {!showApply && (
           <>
             <Button size="lg" onClick={handleApply}>Apply for this job</Button>
+        <p className="text-[11px] text-slate-400 mt-3 font-mono">Ref: {job.id.slice(0, 8)}</p>
             <Button size="lg" variant="outline" onClick={handleSave} loading={saveBusy} aria-pressed={saved}>
               {saved ? <BookmarkCheck className="w-4 h-4" aria-hidden /> : <Bookmark className="w-4 h-4" aria-hidden />}
               {saved ? 'Saved' : 'Save job'}

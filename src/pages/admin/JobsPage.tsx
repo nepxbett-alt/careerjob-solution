@@ -61,6 +61,7 @@ export default function JobsPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [filter, setFilter] = useState<'all' | 'published' | 'draft' | 'paused' | 'closed' | 'featured'>('all');
+  const [idQuery, setIdQuery] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
@@ -231,6 +232,17 @@ export default function JobsPage() {
 
   const featuredCount = jobs.filter((j) => j.is_featured).length;
   const badCount = jobs.filter(isBadSalary).length;
+
+  const q = idQuery.trim().toLowerCase();
+  const visibleJobs = !q
+    ? jobs
+    : jobs.filter(
+        (j) =>
+          j.id.toLowerCase().includes(q) ||
+          j.id.replace(/-/g, '').toLowerCase().includes(q.replace(/-/g, '')) ||
+          j.title.toLowerCase().includes(q) ||
+          (j.location || '').toLowerCase().includes(q)
+      );
 
   return (
     <div className="max-w-4xl">
@@ -553,6 +565,25 @@ export default function JobsPage() {
         </Button>
       </div>
 
+      <div className="mb-3">
+        <label htmlFor="admin-job-search" className="sr-only">Search by job ID or title</label>
+        <input
+          id="admin-job-search"
+          type="search"
+          value={idQuery}
+          onChange={(e) => setIdQuery(e.target.value)}
+          placeholder="Search job ID or title…"
+          className="cj-input max-w-md"
+          autoComplete="off"
+        />
+        {q && (
+          <p className="text-xs text-slate-500 mt-1.5">
+            {visibleJobs.length} result{visibleJobs.length === 1 ? '' : 's'}
+            {visibleJobs.length === 0 ? ' — try full or partial UUID' : ''}
+          </p>
+        )}
+      </div>
+
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-none">
         {(['all', 'published', 'featured', 'draft', 'paused', 'closed'] as const).map((f) => (
           <button
@@ -571,7 +602,10 @@ export default function JobsPage() {
       </div>
 
       {loading && <p className="text-sm text-[#6B7789]">Loading…</p>}
-      {!loading && jobs.length === 0 && (
+      {!loading && jobs.length > 0 && visibleJobs.length === 0 && q && (
+        <p className="text-sm text-slate-500 py-8 text-center">No jobs match “{idQuery}”. Try another ID or title.</p>
+      )}
+      {!loading && jobs.length === 0 && !q && (
         <EmptyState
           title="No jobs in this filter"
           description="Create a vacancy above, or publish from a hiring request."
@@ -584,7 +618,7 @@ export default function JobsPage() {
       )}
 
       <div className="space-y-3">
-        {jobs.map((j) => {
+        {visibleJobs.map((j) => {
           const title = formatJobTitle(j.title) || j.title;
           const salary = formatSalaryDisplay(j.salary_display, j.salary_min, j.salary_max);
           const type = formatJobType(j.job_type);
@@ -600,6 +634,18 @@ export default function JobsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="font-semibold text-[#0B1220]">{title}</h2>
+                    <p className="text-[11px] font-mono text-slate-400 mt-0.5 flex flex-wrap items-center gap-2">
+                      <span title={j.id}>ID: {j.id.slice(0, 8)}…</span>
+                      <button
+                        type="button"
+                        className="text-[#0066FF] font-sans font-medium hover:underline"
+                        onClick={() => {
+                          navigator.clipboard?.writeText(j.id);
+                        }}
+                      >
+                        Copy full ID
+                      </button>
+                    </p>
                     {j.is_featured && (
                       <span className="text-[10px] font-bold uppercase tracking-wide text-[#0066FF]">Featured</span>
                     )}

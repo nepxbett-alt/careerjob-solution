@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Search, FileText } from 'lucide-react';
+import { Phone, FileText } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -73,6 +73,11 @@ export default function CandidatesPage() {
     if (!error) {
       let rows = (data || []) as CandidateRow[];
       if (onlyCv) rows = rows.filter((c) => !!c.cv_url);
+      const qq = q.trim().toLowerCase();
+      if (qq.length >= 4) {
+        const byId = rows.filter((c) => c.id.toLowerCase().includes(qq) || c.id.replace(/-/g, '').includes(qq.replace(/-/g, '')));
+        if (byId.length) rows = byId;
+      }
       setList(rows);
     }
     setLoading(false);
@@ -113,12 +118,11 @@ export default function CandidatesPage() {
         className="flex flex-col sm:flex-row gap-2 mb-3"
       >
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name, phone, or email"
-            className="cj-input pl-10"
+            placeholder="Search name, phone, email, or ID"
+            className="cj-input"
           />
         </div>
         <Button type="submit" size="md">
