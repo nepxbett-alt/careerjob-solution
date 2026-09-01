@@ -45,7 +45,7 @@ export default function ApplicationsPage() {
 
   useEffect(() => {
     if (applyJobId) {
-      getJobById(applyJobId).then((j) => setJobTitle(j.title)).catch(() => {});
+      getJobById(applyJobId).then((j) => { if (j) setJobTitle(j.title); }).catch(() => {});
     }
   }, [applyJobId]);
 

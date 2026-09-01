@@ -41,6 +41,10 @@ export default function JobDetailPage() {
     setLoading(true);
     getJobById(id)
       .then(async (j) => {
+        if (!j) {
+          setError('This job is not available or has been closed.');
+          return;
+        }
         setJob(j);
         if (user) {
           try {

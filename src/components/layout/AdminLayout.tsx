@@ -5,7 +5,7 @@ import {
   Award, Settings, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { isAdminLevel, ROLE_LABELS } from '../../lib/roles';
+import { isAdminLevel } from '../../lib/roles';
 import { cn } from '../../lib/cn';
 import { BrandLogo } from '../BrandLogo';
 
