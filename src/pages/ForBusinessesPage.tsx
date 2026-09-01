@@ -1,47 +1,65 @@
 import { Link } from 'react-router-dom';
+import { Seo } from '../components/Seo';
 import { Button } from '../components/ui/Button';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { CONTACT } from '../lib/config';
+import { Building2, Phone } from 'lucide-react';
 
+/**
+ * Employers do not self-serve on CareerJob.
+ * Hiring is coordinated by CareerJob staff only.
+ */
 export default function ForBusinessesPage() {
   return (
-    <div className="cj-container max-w-3xl cj-page">
-      <p className="text-sm font-medium text-[#0066FF] mb-2">For employers</p>
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-3">Need reliable staff?</h1>
-      <p className="text-lg text-slate-600 mb-10 leading-relaxed max-w-xl">
-        Tell CareerJob what you need. We recruit, screen, and coordinate interviews — you decide who to hire.
+    <div className="cj-container py-12 md:py-16 max-w-xl">
+      <Seo
+        title="Hire with CareerJob | Pokhara Recruitment Agency"
+        description="Contact CareerJob Solution to hire staff in Pokhara. Our team manages recruitment — there is no public employer self-service portal."
+        canonical="https://careerjobsolution.com.np/for-businesses"
+      />
+      <div className="text-center mb-8">
+        <Building2 className="w-10 h-10 text-[#0066FF] mx-auto mb-3" aria-hidden />
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#0B1220] mb-2">
+          Hiring in Pokhara?
+        </h1>
+        <p className="text-[#3D4A5C] leading-relaxed">
+          CareerJob Solution is a recruitment agency. We manage jobs, candidates, and hiring for you.
+          There is no public employer signup or self-service job board for businesses.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-[#E8ECF1] bg-[#F7F9FC] p-5 sm:p-6 space-y-4">
+        <h2 className="font-semibold text-[#0B1220]">How to work with us</h2>
+        <ol className="text-sm text-[#3D4A5C] space-y-2 list-decimal list-inside">
+          <li>Contact our team (call, WhatsApp, or visit the office).</li>
+          <li>Tell us the role, location, salary, and requirements.</li>
+          <li>We publish the vacancy and screen candidates.</li>
+          <li>You interview shortlisted people — we support the process.</li>
+        </ol>
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
+          <WhatsAppButton
+            message="Hello CareerJob, I am an employer and need help hiring in Pokhara."
+            label="WhatsApp CareerJob"
+            className="!rounded-xl !h-11"
+          />
+          <a href={`tel:${CONTACT.phones[0]}`}>
+            <Button variant="outline" size="lg" className="rounded-xl w-full sm:w-auto">
+              <Phone className="w-4 h-4" aria-hidden />
+              Call {CONTACT.phones[0]}
+            </Button>
+          </a>
+        </div>
+        <p className="text-xs text-[#6B7789]">
+          {CONTACT.address} · {CONTACT.officeHours}
+        </p>
+      </div>
+
+      <p className="text-center text-sm text-[#6B7789] mt-8">
+        Looking for a job?{' '}
+        <Link to="/jobs" className="text-[#0066FF] font-semibold">
+          Browse Pokhara jobs
+        </Link>
       </p>
-
-      <div className="space-y-3 mb-10">
-        {[
-          { n: '1', t: 'Submit a hiring request', d: 'Role, headcount, location, salary range and requirements.' },
-          { n: '2', t: 'We review & accept', d: 'Suitable requests become published jobs on the platform.' },
-          { n: '3', t: 'We find candidates', d: 'Applications are screened by our team — not left on autopilot.' },
-          { n: '4', t: 'Interview & select', d: 'We coordinate. You choose who joins.' },
-          { n: '5', t: 'Placement support', d: 'Documentation and joining support when needed.' },
-        ].map((s) => (
-          <div key={s.n} className="flex gap-4 p-4 rounded-2xl border border-slate-200 bg-white">
-            <div className="w-9 h-9 rounded-full bg-[#0066FF] text-white flex items-center justify-center text-sm font-bold shrink-0">
-              {s.n}
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">{s.t}</h3>
-              <p className="text-sm text-slate-600 mt-0.5 leading-relaxed">{s.d}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
-        <Link to="/register">
-          <Button size="lg">Register as business</Button>
-        </Link>
-        <Link to="/login">
-          <Button size="lg" variant="outline">Already registered? Log in</Button>
-        </Link>
-      </div>
-      <WhatsAppButton message="Hello CareerJob, I need help hiring staff." label="Talk on WhatsApp" />
-      <p className="text-xs text-slate-400 mt-6">Or call {CONTACT.phones.join(' / ')}</p>
     </div>
   );
 }

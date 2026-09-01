@@ -36,19 +36,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[#F7F9FC]">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E8ECF1] p-6 sm:p-8 shadow-sm">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="" className="w-14 h-14 object-contain mx-auto mb-3" width="56" height="56" />
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">Log in</h1>
-          <p className="text-sm text-slate-500 mt-1">{BRAND.name} · email magic link</p>
+          <h1 className="text-xl font-bold tracking-tight text-[#0B1220]">Log in</h1>
+          <p className="text-sm text-[#6B7789] mt-1">{BRAND.name} · email magic link</p>
         </div>
 
         {sent ? (
           <div className="text-center" role="status">
-            <p className="font-medium text-slate-900 mb-1">Check your email</p>
-            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-              We sent a sign-in link to <strong className="text-slate-800">{email}</strong>.
+            <p className="font-medium text-[#0B1220] mb-1">Check your email</p>
+            <p className="text-sm text-[#6B7789] mb-6 leading-relaxed">
+              We sent a sign-in link to <strong className="text-[#0B1220]">{email}</strong>.
               Open it on this device to continue.
             </p>
             <Button variant="outline" fullWidth onClick={() => setSent(false)}>
@@ -82,12 +82,12 @@ export default function LoginPage() {
           </form>
         )}
 
-        <p className="text-center text-sm text-slate-500 mt-6">
+        <p className="text-center text-sm text-[#6B7789] mt-6">
           New here?{' '}
           <Link to="/register" className="text-[#0066FF] font-medium hover:underline">Create account</Link>
         </p>
         <p className="text-center text-sm mt-3">
-          <Link to="/" className="text-slate-400 hover:text-slate-600">← Back to home</Link>
+          <Link to="/" className="text-slate-400 hover:text-[#3D4A5C]">← Back to home</Link>
         </p>
       </div>
     </div>

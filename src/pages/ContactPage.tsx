@@ -1,78 +1,93 @@
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
-import { CONTACT } from '../lib/config';
-import { Button } from '../components/ui/Button';
+import { CONTACT, getWhatsAppLink } from '../lib/config';
+import { Seo } from '../components/Seo';
 
 export default function ContactPage() {
+  const items = [
+    {
+      icon: Phone,
+      title: 'Phone',
+      body: (
+        <div className="space-y-1">
+          {CONTACT.phones.map((p) => (
+            <a key={p} href={`tel:+977${p}`} className="block text-[#0066FF] font-medium hover:underline">
+              {p}
+            </a>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: Mail,
+      title: 'Email',
+      body: (
+        <a href={`mailto:${CONTACT.email}`} className="text-[#0066FF] font-medium hover:underline break-all">
+          {CONTACT.email}
+        </a>
+      ),
+    },
+    {
+      icon: MapPin,
+      title: 'Office',
+      body: (
+        <a
+          href={CONTACT.mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#3D4A5C] hover:text-[#0066FF]"
+        >
+          {CONTACT.address}
+        </a>
+      ),
+    },
+    {
+      icon: Clock,
+      title: 'Hours',
+      body: <span className="text-[#3D4A5C]">{CONTACT.officeHours}</span>,
+    },
+  ];
+
   return (
-    <div className="cj-container max-w-3xl cj-page">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-2">Contact</h1>
-      <p className="text-slate-600 mb-8 max-w-lg leading-relaxed">
-        CareerJob Solution — Pokhara. Call, WhatsApp, or email. We help job seekers and businesses.
-      </p>
+    <div className="min-h-[70vh] bg-[#F7F9FC]">
+      <Seo title="Contact | CareerJob Solution" description="Call, WhatsApp, or visit CareerJob Solution in Pokhara." />
+      <div className="cj-container max-w-3xl py-10 md:py-14">
+        <p className="cj-eyebrow mb-2">Get in touch</p>
+        <h1 className="cj-display text-2xl md:text-3xl mb-2">Contact</h1>
+        <p className="text-[#3D4A5C] mb-8 max-w-lg leading-relaxed">
+          CareerJob Solution — Pokhara. Call, WhatsApp, or email. We help job seekers and businesses.
+        </p>
 
-      <div className="grid sm:grid-cols-2 gap-3 mb-8">
-        {[
-          {
-            icon: Phone,
-            title: 'Phone',
-            body: (
-              <div className="space-y-1">
-                {CONTACT.phones.map((p) => (
-                  <a key={p} href={`tel:${p}`} className="block text-slate-800 hover:text-[#0066FF] font-medium">{p}</a>
-                ))}
+        <div className="grid sm:grid-cols-2 gap-3 mb-8">
+          {items.map(({ icon: Icon, title, body }) => (
+            <div
+              key={title}
+              className="flex gap-3.5 p-4 sm:p-5 rounded-2xl border border-[#E8ECF1] bg-white shadow-[0_1px_2px_rgba(11,18,32,0.04)]"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] text-[#0066FF] flex items-center justify-center shrink-0">
+                <Icon className="w-5 h-5" aria-hidden />
               </div>
-            ),
-          },
-          {
-            icon: Mail,
-            title: 'Email',
-            body: (
-              <a href={`mailto:${CONTACT.email}`} className="text-slate-800 hover:text-[#0066FF] font-medium break-all">
-                {CONTACT.email}
-              </a>
-            ),
-          },
-          {
-            icon: MapPin,
-            title: 'Office',
-            body: (
-              <>
-                <p className="text-slate-800">{CONTACT.address}</p>
-                <a href={CONTACT.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#0066FF] font-medium mt-1 inline-block">
-                  Open in Maps
-                </a>
-              </>
-            ),
-          },
-          {
-            icon: Clock,
-            title: 'Hours',
-            body: <p className="text-slate-800">{CONTACT.officeHours}</p>,
-          },
-        ].map((card) => (
-          <div key={card.title} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center gap-2 font-semibold text-slate-900 mb-2">
-              <card.icon className="w-5 h-5 text-[#0066FF]" aria-hidden />
-              {card.title}
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold text-[#0B1220] mb-1">{title}</h2>
+                <div className="text-sm leading-relaxed">{body}</div>
+              </div>
             </div>
-            {card.body}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Map placeholder */}
-      <div className="rounded-2xl border border-slate-200 bg-slate-100 h-48 mb-8 flex items-center justify-center text-sm text-slate-500">
-        <a href={CONTACT.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-[#0066FF] font-medium hover:underline">
-          Srijana Chowk, Pokhara — view on Google Maps
-        </a>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3">
-        <WhatsAppButton label="WhatsApp CareerJob" message="Hello CareerJob, I have a question." />
-        <a href={`tel:${CONTACT.primaryPhone}`}>
-          <Button variant="outline" size="lg">Call {CONTACT.primaryPhone}</Button>
-        </a>
+        <div className="rounded-2xl border border-[#E8ECF1] bg-white p-5 sm:p-6 shadow-[0_1px_2px_rgba(11,18,32,0.04)]">
+          <h2 className="font-semibold text-[#0B1220] mb-1">Fastest response</h2>
+          <p className="text-sm text-[#6B7789] mb-4 leading-relaxed">
+            Message us on WhatsApp for jobs, applications, or hiring requests.
+          </p>
+          <WhatsAppButton label="WhatsApp CareerJob" message="Hello CareerJob, I have a question." />
+          <p className="text-xs text-[#98A2B3] mt-3">
+            Or open{' '}
+            <a className="text-[#0066FF] hover:underline" href={getWhatsAppLink()}>
+              wa.me/{CONTACT.whatsapp}
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

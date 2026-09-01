@@ -1,78 +1,113 @@
 # CareerJob Solution
 
-Nepal-focused recruitment platform operated by CareerJob agency (Pokhara).
+Nepal-focused **recruitment / placement agency** platform operated from Pokhara (Srijana Chowk).
 
-**Not** a freelancer marketplace. Candidates apply → CareerJob reviews → shortlist → interview → placement.  
-Businesses request staff → CareerJob recruits.
+This is **not** a pure job board. Flow:
+
+- **Visitors** browse jobs and apply **without an account**
+- **CareerJob staff** review applications, match candidates, coordinate interviews
+- **Businesses** submit hiring requests; staff publish roles and manage placements
 
 ## Stack
 
-- Frontend: Vite + React 19 + TypeScript + Tailwind 4
-- Backend: Supabase (Auth magic-link, PostgreSQL, RLS, Storage)
-- Hosting: Vercel
+| Layer | Technology |
+|--------|------------|
+| Frontend | Vite 8, React 19, TypeScript, Tailwind CSS 4, React Router 7 |
+| Backend | Supabase (Auth, PostgreSQL, RLS, Storage, Edge Functions) |
+| Hosting | Vercel (`careerjobsolution.com.np`) |
+| i18n | EN \| नेपाली (client `LanguageProvider`) |
 
-## Quick start
+## Architecture (high level)
+
+```
+Visitor ──browse/apply──► Public UI ──► Edge Function (service role)
+                                      └──► candidate_profiles + applications
+Business ──hiring request──► Authenticated UI ──► RLS ──► business_requests
+Staff/Admin ──manage all──► Admin UI ──► RLS (is_staff) ──► full tables
+```
+
+**Authorization is enforced in Postgres RLS**, not only in the React UI.
+
+## Local setup
 
 ```bash
+git clone https://github.com/nepxbett-alt/careerjob-solution.git
+cd careerjob-solution
 npm install
 cp .env.example .env.local
-# set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
+# Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY
 npm run dev
 ```
 
-## Environment (browser only)
+### Scripts
 
-```
-VITE_SUPABASE_URL=
-VITE_SUPABASE_PUBLISHABLE_KEY=
-```
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Local dev server |
+| `npm run build` | `tsc -b && vite build` |
+| `npm run typecheck` | TypeScript only |
+| `npm run lint` | oxlint |
+| `npm run preview` | Preview production build |
 
-Never put service-role or secret keys in `VITE_` variables.
+## Environment variables
 
-## Database
+### Browser (Vercel / `.env.local`)
 
-Migrations live in `supabase/migrations/`:
+| Name | Required | Notes |
+|------|----------|--------|
+| `VITE_SUPABASE_URL` | Yes | Project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | Anon / publishable key only |
 
-1. `20260818000000_initial_schema.sql` — tables, triggers, seed categories + agency settings  
-2. `20260818000001_rls_policies.sql` — RLS  
-3. Storage — run the production storage SQL (buckets + policies)
+### Edge Function secrets (Supabase Dashboard)
+
+| Name | Required | Notes |
+|------|----------|--------|
+| `SUPABASE_URL` | Yes | Usually auto-injected |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | **Never** expose to the browser |
 
 ## Roles
 
 | Role | Access |
 |------|--------|
-| candidate | Own profile, applications, saved jobs |
-| business | Own org, hiring requests |
-| owner / admin | Full operations |
-| recruiter / staff | Candidates, jobs, applications, interviews |
-| accountant | Transactions |
-| viewer | Read-only |
+| Anonymous | Public jobs, public apply (Edge Function) |
+| `candidate` | Own profile, applications, saved jobs, CV |
+| `business` | Own org, hiring requests |
+| `staff` / `recruiter` / `admin` / `owner` | Admin panel (candidates, jobs, applications, walk-ins, …) |
+| `accountant` | Accounting views |
+| `viewer` | Read-oriented staff |
 
-Roles are enforced with RLS. Never trust client-only role checks.
+## Important features
 
-## Contact (configured)
+- **Public apply** — `supabase/functions/public-job-application` (must be deployed with service role)
+- **Admin create job** — Admin → Jobs → Create job
+- **Walk-in candidates** — Admin → Walk-in
+- **Featured jobs** — Admin → Jobs → Feature
+- **WhatsApp** — centralized `src/lib/whatsapp.ts` + `CONTACT.whatsapp`
 
-- WhatsApp / Phone: 9802858215 (also 9802858216, 9802858217)
-- Email: Solutioncareerjob32@gmail.com
-- Address: Srijana Chowk, Pokhara, Nepal
+## Database migrations
 
-## Core flows
+SQL lives in `supabase/migrations/`. Apply via Supabase CLI or SQL editor **in order**. Do not reset production data.
 
-**Candidate:** Search → View job → Register → Profile + CV → Apply → Track status  
+## Deploy
 
-**Business:** Register → Hiring request → CareerJob accepts → Job published → Candidates apply  
+1. Push to `main` → Vercel builds (`npm run build`)
+2. Edge Functions (when code changes):
 
-**Agency:** Review applications → Shortlist → Interview → Select → Place  
+```bash
+supabase login
+supabase link --project-ref snaldzftgtfcjbgktbtb
+supabase functions deploy public-job-application --no-verify-jwt
+```
 
-## Scripts
+Confirm function secrets include the service role key.
 
-- `npm run dev` — local
-- `npm run build` — production build
-- `npm run preview` — preview build
+## Security rules of thumb
 
-## Security
+- No `VITE_*` service-role keys
+- No anonymous INSERT into `candidate_profiles` / `applications` from the client
+- Public job API must not expose private employer phones/emails
+- Storage: candidate docs/photos are private buckets
 
-- RLS on all application tables
-- Private CV bucket with path `{user_id}/...`
-- No service-role key in frontend
-- Status changes audited via triggers
+## License / ownership
+
+Private product for CareerJob Solution (Pokhara).

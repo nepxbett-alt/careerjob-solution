@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Briefcase, FileText, User, Bookmark } from 'lucide-react';
+import { Home, Briefcase, FileText, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { BrandLogo } from '../BrandLogo';
 import { cn } from '../../lib/cn';

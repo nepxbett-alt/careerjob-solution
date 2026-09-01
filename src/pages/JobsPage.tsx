@@ -8,8 +8,9 @@ import { JobCard } from '../components/ui/JobCard';
 import { JobCardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Seo } from '../components/Seo';
-import { POKHARA_AREAS, JOB_TYPES, PRIMARY_CITY } from '../lib/config';
+import { POKHARA_AREAS, JOB_TYPES } from '../lib/config';
 import { cn } from '../lib/cn';
+import { FilterBottomSheet } from '../components/FilterBottomSheet';
 
 export default function JobsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,34 +23,29 @@ export default function JobsPage() {
   const q = searchParams.get('q') || '';
   const area = searchParams.get('area') || '';
   const jobType = searchParams.get('type') || '';
+  const category = searchParams.get('category') || '';
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    // Always Pokhara-focused
+    // Pokhara-area agency inventory: do not require literal "Pokhara" in location strings.
+    // Area chips filter by area name; "All Pokhara" returns the full published set.
     searchJobs({
       q: q || undefined,
-      location: PRIMARY_CITY,
+      location: area && area !== 'All Pokhara' ? area : undefined,
       job_type: jobType || undefined,
+      category: category || undefined,
       page,
+      limit: 24,
     })
       .then(({ jobs, total }) => {
-        let list = jobs;
-        // Optional area filter on location_detail client-side (or expand API later)
-        if (area && area !== 'All Pokhara') {
-          list = jobs.filter(
-            (j) =>
-              (j.location_detail || '').toLowerCase().includes(area.toLowerCase()) ||
-              j.location.toLowerCase().includes(area.toLowerCase())
-          );
-        }
-        setJobs(list);
-        setTotal(area && area !== 'All Pokhara' ? list.length : total);
+        setJobs(jobs);
+        setTotal(total);
       })
       .catch(() => setError("We couldn't load jobs. Please try again."))
       .finally(() => setLoading(false));
-  }, [q, area, jobType, page]);
+  }, [q, area, jobType, category, page]);
 
   const updateParams = (patch: Record<string, string | undefined>) => {
     const next = new URLSearchParams(searchParams);
@@ -57,7 +53,7 @@ export default function JobsPage() {
       if (!v) next.delete(k);
       else next.set(k, v);
     });
-    if ('q' in patch || 'area' in patch || 'type' in patch) next.delete('page');
+    if ('q' in patch || 'area' in patch || 'type' in patch || 'category' in patch) next.delete('page');
     setSearchParams(next);
   };
 
@@ -73,7 +69,7 @@ export default function JobsPage() {
     setShowFilters(false);
   };
 
-  const hasFilters = !!q || (!!area && area !== 'All Pokhara') || !!jobType;
+  const hasFilters = !!q || (!!area && area !== 'All Pokhara') || !!jobType || !!category;
 
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
@@ -115,7 +111,7 @@ export default function JobsPage() {
           </form>
 
           {/* Pokhara area chips only */}
-          <div className="flex gap-2 overflow-x-auto pt-3 pb-0.5 -mx-1 px-1">
+          <div className="flex gap-2 overflow-x-auto pt-3 pb-0.5 -mx-1 px-1 scrollbar-none">
             {POKHARA_AREAS.map((a) => {
               const active = a === 'All Pokhara' ? !area || area === 'All Pokhara' : area === a;
               return (
@@ -199,6 +195,14 @@ export default function JobsPage() {
               </p>
             )}
           </div>
+          {category && (
+            <p className="text-sm text-[#6B7789] mb-2">
+              Filtered by category ·{' '}
+              <button type="button" className="text-[#0066FF] font-medium" onClick={() => updateParams({ category: undefined })}>
+                Clear category
+              </button>
+            </p>
+          )}
           {hasFilters && (
             <button type="button" onClick={clearAll} className="text-sm font-medium text-[#0066FF]">
               Reset
@@ -224,12 +228,28 @@ export default function JobsPage() {
 
         {!loading && !error && jobs.length === 0 && (
           <EmptyState
-            title="No jobs in Pokhara right now"
-            description="New roles are added often. Message CareerJob on WhatsApp or check back soon."
+            title={
+              area && area !== 'All Pokhara' && area !== 'Pokhara'
+                ? `No jobs in ${area} right now`
+                : q
+                  ? `No jobs matching “${q}”`
+                  : 'No open jobs right now'
+            }
+            description={
+              hasFilters
+                ? 'Try All Pokhara, clear filters, or check back soon — new roles are added regularly.'
+                : 'New roles are added often. Message CareerJob on WhatsApp or check back soon.'
+            }
             action={
               <div className="flex flex-wrap justify-center gap-2">
-                {hasFilters && <Button variant="outline" onClick={clearAll}>Clear filters</Button>}
-                <Link to="/contact"><Button>Contact us</Button></Link>
+                {hasFilters && (
+                  <Button variant="outline" onClick={clearAll}>
+                    Clear filters
+                  </Button>
+                )}
+                <Link to="/contact">
+                  <Button variant={hasFilters ? 'primary' : 'outline'}>Contact us</Button>
+                </Link>
               </div>
             }
           />
@@ -243,6 +263,22 @@ export default function JobsPage() {
           </div>
         )}
       </div>
+
+      <FilterBottomSheet
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        area={area}
+        jobType={jobType}
+        onApply={({ area: a, type: ty }) => {
+          updateParams({
+            q: q || undefined,
+            area: a,
+            type: ty,
+            category: category || undefined,
+          });
+        }}
+        onClear={clearAll}
+      />
     </div>
   );
 }

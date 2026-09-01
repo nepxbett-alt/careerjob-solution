@@ -1,4 +1,5 @@
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { Seo } from '../components/Seo';
 
 const FAQS = [
   {
@@ -18,8 +19,8 @@ const FAQS = [
     a: 'Employer contact is coordinated by CareerJob. Public job listings do not show private employer numbers, and we do not freely share your private details without the recruitment process.',
   },
   {
-    q: 'I am a business. How do I hire?',
-    a: 'Register as Business, submit a hiring request, and our team will review it, recruit, and coordinate interviews.',
+    q: 'I am an employer. How do I hire through CareerJob?',
+    a: 'Contact CareerJob by phone, WhatsApp, or visit our office. Our staff manage hiring — there is no public employer self-service portal.',
   },
   {
     q: 'Where is your office?',
@@ -29,19 +30,26 @@ const FAQS = [
 
 export default function FaqPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold mb-8">FAQ</h1>
-      <div className="space-y-4">
-        {FAQS.map((f) => (
-          <div key={f.q} className="border rounded-xl p-4 bg-white">
-            <h2 className="font-semibold mb-1">{f.q}</h2>
-            <p className="text-sm text-gray-600 leading-relaxed">{f.a}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-10">
-        <p className="text-sm text-gray-500 mb-3">Still have a question?</p>
-        <WhatsAppButton message="Hello CareerJob, I have a question." />
+    <div className="min-h-[70vh] bg-[#F7F9FC]">
+      <Seo title="FAQ | CareerJob Solution" description="Frequently asked questions about CareerJob Solution." />
+      <div className="cj-container max-w-3xl py-10 md:py-14">
+        <p className="cj-eyebrow mb-2">Help</p>
+        <h1 className="cj-display text-2xl md:text-3xl mb-8">FAQ</h1>
+        <div className="space-y-3">
+          {FAQS.map((f) => (
+            <div
+              key={f.q}
+              className="rounded-2xl border border-[#E8ECF1] bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(11,18,32,0.04)]"
+            >
+              <h2 className="font-semibold text-[#0B1220] mb-1.5">{f.q}</h2>
+              <p className="text-sm text-[#6B7789] leading-relaxed">{f.a}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-[0_1px_2px_rgba(11,18,32,0.04)]">
+          <p className="text-sm text-[#6B7789] mb-3">Still have a question?</p>
+          <WhatsAppButton message="Hello CareerJob, I have a question." />
+        </div>
       </div>
     </div>
   );
