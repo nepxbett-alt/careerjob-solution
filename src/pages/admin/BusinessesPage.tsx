@@ -7,6 +7,7 @@ import {
   createJobFromRequest,
   publishJob,
 } from '../../services/businessService';
+import { markBusinessContacted } from '../../services/opsService';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/StatusBadge';
@@ -140,10 +141,15 @@ export default function BusinessesPage() {
                 <div>
                   <span className="font-medium text-slate-800">{org?.name || 'Business'}</span>
                   {org?.contact_person && <span className="text-slate-500"> · {org.contact_person}</span>}
-                  {org?.phone && (
-                    <a href={`tel:${org.phone}`} className="flex items-center gap-1 text-[#0066FF] mt-0.5">
-                      <Phone className="w-3.5 h-3.5" aria-hidden /> {org.phone}
+                  {(org?.phone || r.contact_phone) && (
+                    <a href={`tel:${org?.phone || r.contact_phone}`} className="flex items-center gap-1 text-[#0066FF] mt-0.5">
+                      <Phone className="w-3.5 h-3.5" aria-hidden /> {org?.phone || r.contact_phone}
                     </a>
+                  )}
+                  {(r.business_name || r.contact_person) && !org && (
+                    <span className="block text-slate-700">
+                      {r.business_name || ''} {r.contact_person ? `· ${r.contact_person}` : ''}
+                    </span>
                   )}
                 </div>
               </div>
@@ -169,6 +175,24 @@ export default function BusinessesPage() {
 
               {pending && (
                 <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={!!busy}
+                    onClick={async () => {
+                      setBusy(r.id);
+                      try {
+                        await markBusinessContacted(r.id, 'Called business', user?.id);
+                        load();
+                      } catch (e: any) {
+                        alert(e.message || 'Could not mark contacted');
+                      } finally {
+                        setBusy(null);
+                      }
+                    }}
+                  >
+                    Mark contacted
+                  </Button>
                   <Button size="sm" disabled={!!busy} loading={busy === r.id} onClick={() => acceptAndCreateJob(r, true)}>
                     Accept & publish job
                   </Button>
