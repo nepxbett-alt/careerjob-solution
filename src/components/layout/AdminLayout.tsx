@@ -12,9 +12,9 @@ const items = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/walk-in', label: 'Walk-in', icon: UserPlus },
   { to: '/admin/candidates', label: 'Candidates', icon: Users },
-  { to: '/admin/businesses', label: 'Hire requests', icon: Building2 },
+  { to: '/admin/businesses', label: 'Business requests', icon: Building2 },
   { to: '/admin/jobs', label: 'Jobs', icon: Briefcase },
-  { to: '/admin/applications', label: 'Applications', icon: FileText },
+  { to: '/admin/applications', label: 'Job requests', icon: FileText },
   { to: '/admin/placements', label: 'Workplace', icon: Award },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];

@@ -55,14 +55,14 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
       <Seo
-        title="How it works | CareerJob Solution"
+        title="How it works | Career Job Solution"
         description="How CareerJob helps job seekers in Pokhara find work and how employers hire through our agency."
       />
       <div className="cj-container max-w-3xl py-10 md:py-14">
         <p className="cj-eyebrow mb-2">Process</p>
         <h1 className="cj-display text-2xl md:text-3xl mb-2">How it works</h1>
         <p className="text-[#3D4A5C] mb-10 leading-relaxed max-w-xl">
-          CareerJob Solution is a recruitment agency. Candidates find jobs and apply on this website.
+          Career Job Solution is a recruitment agency. Candidates find jobs and apply on this website.
           Employers work with our staff — there is no public employer self-service portal.
         </p>
 

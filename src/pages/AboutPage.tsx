@@ -7,12 +7,12 @@ export default function AboutPage() {
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
       <Seo
-        title="About | CareerJob Solution"
-        description="CareerJob Solution is a recruitment agency in Pokhara connecting people with real jobs."
+        title="About | Career Job Solution"
+        description="Career Job Solution is a recruitment agency in Pokhara connecting people with real jobs."
       />
       <div className="cj-container max-w-3xl py-10 md:py-14">
         <p className="cj-eyebrow mb-2">About us</p>
-        <h1 className="cj-display text-2xl md:text-3xl mb-4">CareerJob Solution</h1>
+        <h1 className="cj-display text-2xl md:text-3xl mb-4">Career Job Solution</h1>
         <div className="space-y-4 text-[#3D4A5C] leading-relaxed mb-10">
           <p>
             We are a recruitment and placement agency based in Srijana Chowk, Pokhara. We help job seekers find
@@ -44,7 +44,7 @@ export default function AboutPage() {
           >
             Browse jobs
           </Link>
-          <WhatsAppButton message="Hello CareerJob, I want to know more about CareerJob Solution." />
+          <WhatsAppButton message="Hello CareerJob, I want to know more about Career Job Solution." />
         </div>
         <p className="text-xs text-[#98A2B3] mt-6">{CONTACT.address}</p>
       </div>

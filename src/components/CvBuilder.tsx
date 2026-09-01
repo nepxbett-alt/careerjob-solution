@@ -385,7 +385,7 @@ export function CvBuilder({
             <p className="text-sm text-slate-400">Preview appears as you fill the form.</p>
           )}
           <p className="text-[10px] text-slate-400 mt-8 pt-4 border-t border-slate-100">
-            CareerJob Solution · Pokhara
+            Career Job Solution · Pokhara
           </p>
         </div>
       </div>

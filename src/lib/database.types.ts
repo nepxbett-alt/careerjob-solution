@@ -1,5 +1,5 @@
 /**
- * Supabase schema types for CareerJob Solution.
+ * Supabase schema types for Career Job Solution.
  * Practical subset aligned with migrations — extend as needed.
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];

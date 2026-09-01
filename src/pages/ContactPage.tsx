@@ -50,12 +50,12 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
-      <Seo title="Contact | CareerJob Solution" description="Call, WhatsApp, or visit CareerJob Solution in Pokhara." />
+      <Seo title="Contact | Career Job Solution" description="Call, WhatsApp, or visit Career Job Solution in Pokhara." />
       <div className="cj-container max-w-3xl py-10 md:py-14">
         <p className="cj-eyebrow mb-2">Get in touch</p>
         <h1 className="cj-display text-2xl md:text-3xl mb-2">Contact</h1>
         <p className="text-[#3D4A5C] mb-8 max-w-lg leading-relaxed">
-          CareerJob Solution — Pokhara. Call, WhatsApp, or email. We help job seekers and businesses.
+          Career Job Solution — Pokhara. Call, WhatsApp, or email. We help job seekers and businesses.
         </p>
 
         <div className="grid sm:grid-cols-2 gap-3 mb-8">

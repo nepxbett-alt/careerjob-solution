@@ -79,7 +79,7 @@ export default function HireStaffPage() {
 
   return (
     <div className="cj-container max-w-lg py-10">
-      <Seo title="Hire Staff | CareerJob Solution" description="Tell us who you need. CareerJob Pokhara recruits for you." />
+      <Seo title="Hire Staff | Career Job Solution" description="Tell us who you need. CareerJob Pokhara recruits for you." />
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Hire staff</h1>
       <p className="text-sm text-slate-500 mb-6">
         Tell us what employee you need. We screen candidates and coordinate with your workplace.

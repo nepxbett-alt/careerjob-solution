@@ -32,9 +32,9 @@ export function WhatsAppButton({
   const title = job?.title?.trim();
   const ariaLabel = job
     ? title
-      ? `Contact CareerJob Solution about ${title} on WhatsApp`
-      : 'Contact CareerJob Solution about this job on WhatsApp'
-    : 'Chat with CareerJob Solution on WhatsApp';
+      ? `Contact Career Job Solution about ${title} on WhatsApp`
+      : 'Contact Career Job Solution about this job on WhatsApp'
+    : 'Chat with Career Job Solution on WhatsApp';
 
   const handleClick = () => {
     // Optional safe analytics hook if the host defines one

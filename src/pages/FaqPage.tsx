@@ -31,7 +31,7 @@ const FAQS = [
 export default function FaqPage() {
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
-      <Seo title="FAQ | CareerJob Solution" description="Frequently asked questions about CareerJob Solution." />
+      <Seo title="FAQ | Career Job Solution" description="Frequently asked questions about Career Job Solution." />
       <div className="cj-container max-w-3xl py-10 md:py-14">
         <p className="cj-eyebrow mb-2">Help</p>
         <h1 className="cj-display text-2xl md:text-3xl mb-8">FAQ</h1>

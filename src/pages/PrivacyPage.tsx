@@ -9,7 +9,7 @@ export default function PrivacyPage() {
 
       <h2 className="font-semibold text-lg mt-6 mb-2">Who we are</h2>
       <p className="text-slate-700 mb-4">
-        CareerJob Solution is a recruitment agency based in Pokhara, Nepal. We process personal data
+        Career Job Solution is a recruitment agency based in Pokhara, Nepal. We process personal data
         to help candidates find jobs and businesses hire staff.
       </p>
 

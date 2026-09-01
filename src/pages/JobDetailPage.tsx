@@ -119,7 +119,7 @@ export default function JobDetailPage() {
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://careerjobsolution.com.np';
   const canonical = `${origin}/jobs/${job.id}`;
-  const desc = (job.description || `${job.title} in ${job.location}. Apply via CareerJob Solution.`).slice(0, 160);
+  const desc = (job.description || `${job.title} in ${job.location}. Apply via Career Job Solution.`).slice(0, 160);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
@@ -129,7 +129,7 @@ export default function JobDetailPage() {
     employmentType: (job.job_type || 'FULL_TIME').toUpperCase().replace('-', '_'),
     hiringOrganization: {
       '@type': 'Organization',
-      name: job.public_employer_label || 'CareerJob Solution',
+      name: job.public_employer_label || 'Career Job Solution',
     },
     jobLocation: {
       '@type': 'Place',
@@ -145,7 +145,7 @@ export default function JobDetailPage() {
   return (
     <div className="cj-container max-w-3xl py-8 pb-28 md:pb-12">
       <Seo
-        title={`${displayTitle} in ${locationLabel || job.location} | CareerJob Solution`}
+        title={`${displayTitle} in ${locationLabel || job.location} | Career Job Solution`}
         description={desc}
         canonical={canonical}
         jsonLd={jsonLd}
@@ -315,7 +315,7 @@ export default function JobDetailPage() {
             <section className="mb-8 rounded-2xl border border-[#E8ECF1] p-4 bg-white">
               <h2 className="font-semibold text-[#0B1220] mb-2">How to apply</h2>
               <p className="text-sm text-[#3D4A5C] leading-relaxed">
-                Apply through CareerJob Solution. No account is required. Our team reviews every application and contacts you if you are shortlisted.
+                Apply through Career Job Solution. No account is required. Our team reviews every application and contacts you if you are shortlisted.
                 {job.application_deadline ? ` Application deadline: ${job.application_deadline}.` : ''}
               </p>
             </section>

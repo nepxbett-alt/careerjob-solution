@@ -1,5 +1,5 @@
 /**
- * Centralized WhatsApp contact helpers for CareerJob Solution.
+ * Centralized WhatsApp contact helpers for Career Job Solution.
  * Only public-safe job fields are included in messages.
  */
 import { CONTACT, WHATSAPP_BASE } from './config';
@@ -49,11 +49,11 @@ export function buildJobWhatsAppMessage(job: WhatsAppJobInput, lang: Lang = 'en'
   const ref = (job.public_reference || '').trim() || null;
 
   if (lang === 'ne') {
-    const lines: string[] = ['नमस्कार CareerJob Solution 👋', ''];
+    const lines: string[] = ['नमस्कार Career Job Solution 👋', ''];
     if (title) {
       lines.push(`म "${title}" पदका लागि रुचि राख्दैछु।`);
     } else {
-      lines.push('म CareerJob Solution मा सूचीकृत एक vacancy का लागि रुचि राख्दैछु।');
+      lines.push('म Career Job Solution मा सूचीकृत एक vacancy का लागि रुचि राख्दैछु।');
     }
     if (location) {
       lines.push(`स्थान: "${location}"`);
@@ -62,7 +62,7 @@ export function buildJobWhatsAppMessage(job: WhatsAppJobInput, lang: Lang = 'en'
       lines.push(`Job Reference: ${ref}`);
     }
     lines.push('');
-    lines.push('यो vacancy मैले CareerJob Solution मा भेटेको हुँ। आवेदन कसरी दिने भन्नेबारे थप जानकारी चाहन्छु।');
+    lines.push('यो vacancy मैले Career Job Solution मा भेटेको हुँ। आवेदन कसरी दिने भन्नेबारे थप जानकारी चाहन्छु।');
     lines.push('');
     lines.push(`Job: ${url}`);
     lines.push('');
@@ -71,7 +71,7 @@ export function buildJobWhatsAppMessage(job: WhatsAppJobInput, lang: Lang = 'en'
   }
 
   // English
-  const lines: string[] = ['Hello CareerJob Solution 👋', ''];
+  const lines: string[] = ['Hello Career Job Solution 👋', ''];
   if (title) {
     if (location) {
       lines.push(`I am interested in the "${title}" position in "${location}".`);
@@ -79,14 +79,14 @@ export function buildJobWhatsAppMessage(job: WhatsAppJobInput, lang: Lang = 'en'
       lines.push(`I am interested in the "${title}" position.`);
     }
   } else {
-    lines.push('I am interested in a job vacancy listed on CareerJob Solution.');
+    lines.push('I am interested in a job vacancy listed on Career Job Solution.');
   }
   if (ref) {
     lines.push(`Job Reference: ${ref}`);
   }
   lines.push('');
   lines.push(
-    'I found this vacancy on CareerJob Solution and would like to know more about how to apply.',
+    'I found this vacancy on Career Job Solution and would like to know more about how to apply.',
   );
   lines.push('');
   lines.push(`Job: ${url}`);

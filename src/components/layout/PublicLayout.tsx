@@ -148,7 +148,7 @@ export default function PublicLayout() {
           </div>
         </div>
         <div className="cj-container pb-8 pt-2 border-t border-slate-200/80 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} CareerJob Solution · Pokhara, Nepal
+          © {new Date().getFullYear()} Career Job Solution · Pokhara, Nepal
         </div>
       </footer>
 

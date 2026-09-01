@@ -74,7 +74,7 @@ export default function JobsPage() {
   return (
     <div className="min-h-[70vh] bg-[#F7F9FC]">
       <Seo
-        title="Jobs in Pokhara | CareerJob Solution"
+        title="Jobs in Pokhara | Career Job Solution"
         description="Find jobs in Pokhara. Apply simply — CareerJob reviews every application."
         canonical="https://careerjobsolution.com.np/jobs"
       />

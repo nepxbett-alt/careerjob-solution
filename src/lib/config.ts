@@ -1,5 +1,5 @@
 /**
- * Central configuration for CareerJob Solution.
+ * Central configuration for Career Job Solution.
  * Public contact values are safe to expose.
  * Never put secrets here.
  */
@@ -62,7 +62,7 @@ export const APPLICATION_STATUSES = [
 ] as const;
 
 export const BRAND = {
-  name: 'CareerJob Solution',
+  name: 'Career Job Solution',
   tagline: 'Jobs in Pokhara. Real recruitment support.',
   primaryColor: '#0066FF',
 } as const;

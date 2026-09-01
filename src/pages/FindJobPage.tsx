@@ -67,7 +67,7 @@ export default function FindJobPage() {
 
   return (
     <div className="cj-container max-w-lg py-10">
-      <Seo title="Find a Job | CareerJob Solution" description="Submit your details. CareerJob Pokhara will contact you." />
+      <Seo title="Find a Job | Career Job Solution" description="Submit your details. CareerJob Pokhara will contact you." />
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Find a job</h1>
       <p className="text-sm text-slate-500 mb-6">
         Submit your details. Our team contacts you and matches you with suitable workplaces in Pokhara.

@@ -14,7 +14,7 @@ export default function ForBusinessesPage() {
     <div className="cj-container py-12 md:py-16 max-w-xl">
       <Seo
         title="Hire with CareerJob | Pokhara Recruitment Agency"
-        description="Contact CareerJob Solution to hire staff in Pokhara. Our team manages recruitment — there is no public employer self-service portal."
+        description="Contact Career Job Solution to hire staff in Pokhara. Our team manages recruitment — there is no public employer self-service portal."
         canonical="https://careerjobsolution.com.np/for-businesses"
       />
       <div className="text-center mb-8">
@@ -23,7 +23,7 @@ export default function ForBusinessesPage() {
           Hiring in Pokhara?
         </h1>
         <p className="text-[#3D4A5C] leading-relaxed">
-          CareerJob Solution is a recruitment agency. We manage jobs, candidates, and hiring for you.
+          Career Job Solution is a recruitment agency. We manage jobs, candidates, and hiring for you.
           There is no public employer signup or self-service job board for businesses.
         </p>
       </div>

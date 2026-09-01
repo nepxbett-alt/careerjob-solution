@@ -9,7 +9,7 @@ export default function TermsPage() {
 
       <h2 className="font-semibold text-lg mt-6 mb-2">Service</h2>
       <p className="text-slate-700 mb-4">
-        CareerJob Solution provides a digital recruitment service operated by our agency.
+        Career Job Solution provides a digital recruitment service operated by our agency.
         We connect job seekers with opportunities and help businesses hire. We are not a
         freelancer marketplace and do not guarantee employment or any specific salary.
       </p>
