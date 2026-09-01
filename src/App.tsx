@@ -36,6 +36,7 @@ import AdminBusinesses from './pages/admin/BusinessesPage';
 import AdminPlacements from './pages/admin/PlacementsPage';
 import AdminSettings from './pages/admin/SettingsPage';
 import AdminWalkIn from './pages/admin/WalkInPage';
+import AdminCreateCv from './pages/admin/CreateCvPage';
 import AdminCandidateDetail from './pages/admin/CandidateDetailPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -106,6 +107,7 @@ export default function App() {
           <Route path="candidates" element={<AdminCandidates />} />
           <Route path="candidates/:id" element={<AdminCandidateDetail />} />
           <Route path="walk-in" element={<AdminWalkIn />} />
+          <Route path="create-cv" element={<AdminCreateCv />} />
           <Route path="jobs" element={<AdminJobs />} />
           <Route path="applications" element={<AdminApplications />} />
           <Route path="businesses" element={<AdminBusinesses />} />

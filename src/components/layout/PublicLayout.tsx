@@ -15,6 +15,7 @@ export default function PublicLayout() {
   const nav = [
     { to: '/', label: 'Home' },
     { to: '/jobs', label: 'Jobs' },
+    { to: '/candidate/cv', label: 'Create CV' },
   { to: '/find-a-job', label: 'Find a job' },
   { to: '/hire-staff', label: 'Hire staff' },
     { to: '/for-businesses', label: 'For businesses' },
@@ -25,7 +26,7 @@ export default function PublicLayout() {
   const dashPath =
     profile?.role === 'candidate' ? '/candidate' :
     profile?.role === 'business' ? '/business' :
-    profile?.role && ['owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role)
+    profile?.role && ['owner', 'admin', 'manager', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role)
       ? '/admin' : '/candidate';
 
   return (

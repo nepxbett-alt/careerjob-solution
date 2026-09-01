@@ -31,7 +31,7 @@ export default function CandidateLayout() {
         <NavLink to="/candidate" end className={linkClass}><Home className="w-5 h-5" aria-hidden />Home</NavLink>
         <NavLink to="/jobs" className={linkClass}><Briefcase className="w-5 h-5" aria-hidden />Jobs</NavLink>
         <NavLink to="/candidate/applications" className={linkClass}><FileText className="w-5 h-5" aria-hidden />Apps</NavLink>
-        <NavLink to="/candidate/cv" className={linkClass}><FileText className="w-5 h-5" aria-hidden />CV</NavLink>
+        <NavLink to="/candidate/cv" className={linkClass}><FileText className="w-5 h-5" aria-hidden />Create CV</NavLink>
         <NavLink to="/candidate/profile" className={linkClass}><User className="w-5 h-5" aria-hidden />Profile</NavLink>
       </nav>
     </div>

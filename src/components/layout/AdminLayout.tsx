@@ -12,6 +12,7 @@ import { BrandLogo } from '../BrandLogo';
 const items = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/walk-in', label: 'Walk-in', icon: UserPlus },
+  { to: '/admin/create-cv', label: 'Create CV', icon: FileText },
   { to: '/admin/candidates', label: 'Candidates', icon: Users },
   { to: '/admin/businesses', label: 'Business requests', icon: Building2 },
   { to: '/admin/jobs', label: 'Jobs', icon: Briefcase },
