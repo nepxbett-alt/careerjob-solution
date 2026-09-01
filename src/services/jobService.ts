@@ -49,7 +49,6 @@ export async function searchJobs(filters: JobFilters = {}) {
     .from('jobs')
     .select(JOB_SELECT, { count: 'exact' })
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .order('is_featured', { ascending: false })
     .order('published_at', { ascending: false });
 
@@ -93,7 +92,6 @@ export async function getFeaturedJobs(limit = 6) {
     .from('jobs')
     .select(JOB_SELECT)
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .eq('is_featured', true)
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -112,7 +110,6 @@ export async function getFeaturedJobs(limit = 6) {
     .from('jobs')
     .select(JOB_SELECT)
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .order('published_at', { ascending: false })
     .limit(need);
 
@@ -126,16 +123,24 @@ export async function getFeaturedJobs(limit = 6) {
 }
 
 export async function getJobById(id: string) {
-  const { data, error } = await supabase
-    .from('jobs')
-    .select(JOB_SELECT)
-    .eq('id', id)
-    .eq('status', 'published')
-    .eq('approved_by_agency', true)
-    .single();
-
+  // UUID or human job code (CJS-2026-00001)
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  let q = supabase.from('jobs').select(JOB_SELECT).eq('status', 'published');
+  q = isUuid ? q.eq('id', id) : q.eq('job_code', id);
+  const { data, error } = await q.maybeSingle();
   if (error) throw error;
-  return data as unknown as Job;
+  if (!data && !isUuid) {
+    // try id prefix / code case-insensitive
+    const { data: d2, error: e2 } = await supabase
+      .from('jobs')
+      .select(JOB_SELECT)
+      .eq('status', 'published')
+      .ilike('job_code', id)
+      .maybeSingle();
+    if (e2) throw e2;
+    return d2 as unknown as Job | null;
+  }
+  return data as unknown as Job | null;
 }
 
 export async function setJobFeatured(jobId: string, featured: boolean) {
@@ -269,8 +274,7 @@ export async function getCategoriesWithCounts(): Promise<CategoryCount[]> {
     supabase
       .from('jobs')
       .select('category_id')
-      .eq('status', 'published')
-      .eq('approved_by_agency', true),
+      .eq('status', 'published'),
   ]);
   if (cErr) throw cErr;
   if (jErr) throw jErr;
@@ -292,8 +296,7 @@ export async function getPublishedJobCount(): Promise<number> {
   const { count, error } = await supabase
     .from('jobs')
     .select('id', { count: 'exact', head: true })
-    .eq('status', 'published')
-    .eq('approved_by_agency', true);
+    .eq('status', 'published');
   if (error) throw error;
   return count || 0;
 }
@@ -327,8 +330,7 @@ export async function getPokharaAreaCounts(): Promise<AreaCount[]> {
   const { data, error } = await supabase
     .from('jobs')
     .select('location, location_detail')
-    .eq('status', 'published')
-    .eq('approved_by_agency', true);
+    .eq('status', 'published');
   if (error) throw error;
 
   const counts = new Map<string, number>();
@@ -368,7 +370,6 @@ export async function getClosingSoonJobs(limit = 4): Promise<Job[]> {
     .from('jobs')
     .select(JOB_SELECT)
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .not('application_deadline', 'is', null)
     .gte('application_deadline', today)
     .order('application_deadline', { ascending: true })
@@ -392,7 +393,6 @@ export async function getHospitalityJobs(limit = 6): Promise<Job[]> {
     .from('jobs')
     .select(JOB_SELECT)
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .in('category_id', ids)
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -414,8 +414,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     supabase
       .from('jobs')
       .select('id', { count: 'exact', head: true })
-      .eq('status', 'published')
-      .eq('approved_by_agency', true),
+      .eq('status', 'published'),
     supabase.from('candidate_profiles').select('id', { count: 'exact', head: true }),
     supabase.from('organizations').select('id', { count: 'exact', head: true }),
     supabase.from('applications').select('id', { count: 'exact', head: true }),
@@ -439,7 +438,6 @@ export async function getHiringNowLabels(limit = 6): Promise<HiringLabelCount[]>
     .from('jobs')
     .select('public_employer_label')
     .eq('status', 'published')
-    .eq('approved_by_agency', true)
     .not('public_employer_label', 'is', null);
   if (error) throw error;
   const map = new Map<string, number>();
