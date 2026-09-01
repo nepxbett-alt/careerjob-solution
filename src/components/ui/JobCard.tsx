@@ -44,6 +44,11 @@ export function JobCard({ job }: { job: Job }) {
             {title}
           </h2>
           {employer && <p className="text-sm text-[#6B7789] mt-1 truncate">{employer}</p>}
+          {(job.job_code || job.id) && (
+            <p className="text-[11px] font-mono text-[#98A2B3] mt-1">
+              {job.job_code || `ID ${job.id.slice(0, 8)}`}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-[13px] text-[#3D4A5C]">

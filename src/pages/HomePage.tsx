@@ -137,19 +137,19 @@ export default function HomePage() {
             </form>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5">
-              <Link to="/jobs" className="w-full sm:w-auto">
+              <Link to="/find-a-job" className="w-full sm:w-auto">
                 <Button fullWidth className="sm:w-auto rounded-xl h-11">
-                  <Briefcase className="w-4 h-4" aria-hidden /> Browse jobs
-                </Button>
-              </Link>
-              <Link to="/register" className="w-full sm:w-auto">
-                <Button variant="outline" fullWidth className="sm:w-auto rounded-xl h-11">
-                  <FileText className="w-4 h-4" aria-hidden /> Create your CV
+                  <Briefcase className="w-4 h-4" aria-hidden /> Find a job
                 </Button>
               </Link>
               <Link to="/hire-staff" className="w-full sm:w-auto">
-                <Button variant="ghost" fullWidth className="sm:w-auto rounded-xl h-11">
+                <Button variant="outline" fullWidth className="sm:w-auto rounded-xl h-11">
                   <Users className="w-4 h-4" aria-hidden /> Hire staff
+                </Button>
+              </Link>
+              <Link to="/jobs" className="w-full sm:w-auto">
+                <Button variant="ghost" fullWidth className="sm:w-auto rounded-xl h-11">
+                  Browse jobs
                 </Button>
               </Link>
             </div>

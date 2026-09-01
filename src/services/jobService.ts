@@ -23,6 +23,7 @@ export interface Job {
   created_at: string;
   published_at: string | null;
   category_id: string | null;
+  job_code?: string | null;
   job_categories?: { name: string; slug: string } | null;
 }
 
@@ -36,7 +37,7 @@ export interface JobFilters {
 }
 
 const JOB_SELECT =
-  'id, title, location, location_detail, salary_display, salary_min, salary_max, job_type, experience_required, education_required, description, responsibilities, requirements, skills, benefits, application_deadline, status, public_employer_label, is_featured, created_at, published_at, category_id, job_categories(name, slug)';
+  'id, title, location, location_detail, salary_display, salary_min, salary_max, job_type, experience_required, education_required, description, responsibilities, requirements, skills, benefits, application_deadline, status, public_employer_label, is_featured, created_at, published_at, category_id, job_code, job_categories(name, slug)';
 
 export async function searchJobs(filters: JobFilters = {}) {
   const page = filters.page || 1;
@@ -66,7 +67,12 @@ export async function searchJobs(filters: JobFilters = {}) {
     );
   }
   if (filters.q) {
-    query = query.or(`title.ilike.%${filters.q}%,description.ilike.%${filters.q}%`);
+    const qq = filters.q.trim();
+    if (/^cjs-/i.test(qq) || /^[0-9a-f]{8}/i.test(qq)) {
+      query = query.or(`job_code.ilike.%${qq}%,id.ilike.%${qq}%,title.ilike.%${qq}%`);
+    } else {
+      query = query.or(`title.ilike.%${qq}%,description.ilike.%${qq}%,job_code.ilike.%${qq}%`);
+    }
   }
   if (filters.job_type) {
     query = query.eq('job_type', filters.job_type);
@@ -177,6 +183,24 @@ function buildSalaryDisplay(min?: number | null, max?: number | null): string | 
 }
 
 /** Staff/admin creates a vacancy directly (walk-in employer or internal listing). */
+export async function nextJobCode(): Promise<string> {
+  const year = new Date().getFullYear();
+  const prefix = `CJS-${year}-`;
+  const { data } = await supabase
+    .from('jobs')
+    .select('job_code')
+    .ilike('job_code', `${prefix}%`)
+    .order('job_code', { ascending: false })
+    .limit(1);
+  let n = 1;
+  if (data?.[0]?.job_code) {
+    const parts = String(data[0].job_code).split('-');
+    const last = parseInt(parts[parts.length - 1] || '0', 10);
+    if (!Number.isNaN(last)) n = last + 1;
+  }
+  return `${prefix}${String(n).padStart(5, '0')}`;
+}
+
 export async function createAdminJob(input: AdminCreateJobInput) {
   const title = (input.title || '').trim();
   if (!title) throw new Error('Job title is required');
@@ -195,8 +219,11 @@ export async function createAdminJob(input: AdminCreateJobInput) {
   const location = (input.location || 'Pokhara').trim() || 'Pokhara';
   const locationDetail = (input.location_detail || '').trim() || null;
 
+  const job_code = await nextJobCode();
+
   const row = {
     title,
+    job_code,
     location,
     location_detail: locationDetail,
     job_type: input.job_type || 'full-time',

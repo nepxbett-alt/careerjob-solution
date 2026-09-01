@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 interface JobRow {
   id: string;
   title: string;
+  job_code?: string | null;
   location: string;
   status: string;
   approved_by_agency: boolean;
@@ -72,7 +73,7 @@ export default function JobsPage() {
     let q = supabase
       .from('jobs')
       .select(
-        'id, title, location, status, approved_by_agency, salary_display, salary_min, salary_max, published_at, created_at, job_type, is_featured',
+        'id, title, job_code, location, status, approved_by_agency, salary_display, salary_min, salary_max, published_at, created_at, job_type, is_featured',
       )
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
@@ -240,6 +241,7 @@ export default function JobsPage() {
         (j) =>
           j.id.toLowerCase().includes(q) ||
           j.id.replace(/-/g, '').toLowerCase().includes(q.replace(/-/g, '')) ||
+          (j.job_code || '').toLowerCase().includes(q) ||
           j.title.toLowerCase().includes(q) ||
           (j.location || '').toLowerCase().includes(q)
       );
@@ -572,7 +574,7 @@ export default function JobsPage() {
           type="search"
           value={idQuery}
           onChange={(e) => setIdQuery(e.target.value)}
-          placeholder="Search job ID or title…"
+          placeholder="Search CJS-… code, UUID, or title…"
           className="cj-input max-w-md"
           autoComplete="off"
         />
@@ -635,15 +637,21 @@ export default function JobsPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="font-semibold text-[#0B1220]">{title}</h2>
                     <p className="text-[11px] font-mono text-slate-400 mt-0.5 flex flex-wrap items-center gap-2">
-                      <span title={j.id}>ID: {j.id.slice(0, 8)}…</span>
+                      <span className="font-semibold text-slate-600">{j.job_code || j.id.slice(0, 8)}</span>
                       <button
                         type="button"
                         className="text-[#0066FF] font-sans font-medium hover:underline"
-                        onClick={() => {
-                          navigator.clipboard?.writeText(j.id);
-                        }}
+                        onClick={() => navigator.clipboard?.writeText(j.job_code || j.id)}
                       >
-                        Copy full ID
+                        Copy
+                      </button>
+                      <button
+                        type="button"
+                        className="text-slate-400 font-sans hover:underline"
+                        onClick={() => navigator.clipboard?.writeText(j.id)}
+                        title={j.id}
+                      >
+                        UUID
                       </button>
                     </p>
                     {j.is_featured && (
