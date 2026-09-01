@@ -204,6 +204,20 @@ export default function SettingsPage() {
           </li>
         </ul>
       </section>
+
+      <section className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm mt-4">
+        <h2 className="font-semibold text-slate-900 mb-2">Staff roles</h2>
+        <ul className="text-sm text-slate-600 space-y-1.5 list-disc pl-5">
+          <li><strong>Owner / Admin</strong> — full control + Settings</li>
+          <li><strong>Manager</strong> — full recruitment desk (candidates, jobs, workplace, trials). Use for reception desk lead.</li>
+          <li><strong>Recruiter / Staff</strong> — day-to-day matching and follow-ups</li>
+          <li><strong>Viewer</strong> — read-only</li>
+        </ul>
+        <p className="text-xs text-slate-400 mt-3">
+          Example: <code className="text-[11px] bg-slate-50 px-1 rounded">UPDATE profiles SET role = &apos;manager&apos; WHERE email = &apos;receptionist@…&apos;;</code>
+        </p>
+      </section>
+
     </div>
   );
 }

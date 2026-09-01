@@ -9,6 +9,7 @@ export type UserRole =
   | 'business'
   | 'owner'
   | 'admin'
+  | 'manager'
   | 'recruiter'
   | 'staff'
   | 'accountant'

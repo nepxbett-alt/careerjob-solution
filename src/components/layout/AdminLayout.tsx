@@ -5,6 +5,7 @@ import {
   Award, Settings, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { isAdminLevel, ROLE_LABELS } from '../../lib/roles';
 import { cn } from '../../lib/cn';
 import { BrandLogo } from '../BrandLogo';
 
@@ -22,10 +23,14 @@ const items = [
 export default function AdminLayout() {
   const { profile, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+  const visibleItems = items.filter((item) => {
+    if (item.to === '/admin/settings') return isAdminLevel(profile?.role);
+    return true;
+  });
 
   const nav = (
     <nav className="flex-1 py-3 space-y-0.5 overflow-y-auto">
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}

@@ -34,7 +34,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
   if (!allowedRoles.includes(profile.role)) {
     if (profile.role === 'candidate') return <Navigate to="/candidate" replace />;
     if (profile.role === 'business') return <Navigate to="/business" replace />;
-    if (['owner', 'admin', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role)) {
+    if (['owner', 'admin', 'manager', 'recruiter', 'staff', 'accountant', 'viewer'].includes(profile.role)) {
       return <Navigate to="/admin" replace />;
     }
     return <Navigate to="/" replace />;
