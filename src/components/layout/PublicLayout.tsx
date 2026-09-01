@@ -15,6 +15,8 @@ export default function PublicLayout() {
   const nav = [
     { to: '/', label: 'Home' },
     { to: '/jobs', label: 'Jobs' },
+  { to: '/find-a-job', label: 'Find a job' },
+  { to: '/hire-staff', label: 'Hire staff' },
     { to: '/for-businesses', label: 'For businesses' },
     { to: '/how-it-works', label: 'How it works' },
     { to: '/contact', label: 'Contact' },

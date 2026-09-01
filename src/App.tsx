@@ -14,6 +14,8 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import FaqPage from './pages/FaqPage';
 import NotFoundPage from './pages/NotFoundPage';
+import FindJobPage from './pages/FindJobPage';
+import HireStaffPage from './pages/HireStaffPage';
 import CandidateLayout from './components/layout/CandidateLayout';
 import CandidateHome from './pages/candidate/HomePage';
 import CandidateApplications from './pages/candidate/ApplicationsPage';
@@ -31,9 +33,7 @@ import AdminCandidates from './pages/admin/CandidatesPage';
 import AdminJobs from './pages/admin/JobsPage';
 import AdminApplications from './pages/admin/ApplicationsPage';
 import AdminBusinesses from './pages/admin/BusinessesPage';
-import AdminInterviews from './pages/admin/InterviewsPage';
 import AdminPlacements from './pages/admin/PlacementsPage';
-import AdminAccounting from './pages/admin/AccountingPage';
 import AdminSettings from './pages/admin/SettingsPage';
 import AdminWalkIn from './pages/admin/WalkInPage';
 import AdminCandidateDetail from './pages/admin/CandidateDetailPage';
@@ -47,6 +47,8 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/find-a-job" element={<FindJobPage />} />
+          <Route path="/hire-staff" element={<HireStaffPage />} />
           <Route path="/jobs/:id" element={<JobDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
@@ -107,9 +109,7 @@ export default function App() {
           <Route path="jobs" element={<AdminJobs />} />
           <Route path="applications" element={<AdminApplications />} />
           <Route path="businesses" element={<AdminBusinesses />} />
-          <Route path="interviews" element={<AdminInterviews />} />
           <Route path="placements" element={<AdminPlacements />} />
-          <Route path="accounting" element={<AdminAccounting />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserPlus, Briefcase, FileText, Building2,
-  Calendar, Award, Wallet, Settings, Menu, X,
+  Award, Settings, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/cn';
@@ -12,12 +12,10 @@ const items = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/walk-in', label: 'Walk-in', icon: UserPlus },
   { to: '/admin/candidates', label: 'Candidates', icon: Users },
+  { to: '/admin/businesses', label: 'Hire requests', icon: Building2 },
   { to: '/admin/jobs', label: 'Jobs', icon: Briefcase },
   { to: '/admin/applications', label: 'Applications', icon: FileText },
-  { to: '/admin/businesses', label: 'Businesses', icon: Building2 },
-  { to: '/admin/interviews', label: 'Interviews', icon: Calendar },
-  { to: '/admin/placements', label: 'Placements', icon: Award },
-  { to: '/admin/accounting', label: 'Accounting', icon: Wallet },
+  { to: '/admin/placements', label: 'Workplace', icon: Award },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

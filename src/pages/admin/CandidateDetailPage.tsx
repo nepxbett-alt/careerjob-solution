@@ -42,6 +42,15 @@ export default function CandidateDetailPage() {
   const [cvBusy, setCvBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [activity, setActivity] = useState<any[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [sendOpen, setSendOpen] = useState(false);
+  const [wpName, setWpName] = useState('');
+  const [wpPos, setWpPos] = useState('');
+  const [wpSalary, setWpSalary] = useState('');
+  const [wpNotes, setWpNotes] = useState('');
+  const [trialDays, setTrialDays] = useState('7');
 
   const load = async () => {
     if (!id) return;
@@ -63,6 +72,16 @@ export default function CandidateDetailPage() {
       return true; // still show Pokhara jobs as options
     });
     setJobs(matched.slice(0, 8));
+    try {
+      const act = await getActivity('candidate', id);
+      setActivity(act);
+      const { data: wa } = await supabase
+        .from('workplace_assignments')
+        .select('*')
+        .eq('candidate_id', id)
+        .order('created_at', { ascending: false });
+      setAssignments(wa || []);
+    } catch { /* tables may not exist until migration */ }
     setLoading(false);
   };
 
@@ -227,6 +246,125 @@ export default function CandidateDetailPage() {
           </ul>
         )}
         <Link to="/admin/jobs" className="inline-block text-sm text-[#0066FF] font-medium mt-3">All jobs →</Link>
+      </section>
+
+
+      {/* Ops workflow */}
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <h2 className="font-semibold text-slate-900">Recruitment actions</h2>
+        <p className="text-xs text-slate-500">
+          Status: <StatusBadge status={(c as any).ops_status || c.seeker_status || 'new_request'} />
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" disabled={busy} onClick={async () => {
+            setBusy(true);
+            try {
+              await markCandidateContacted(c.id, undefined, user?.id);
+              setMsg('Marked contacted');
+              load();
+            } catch (e: any) { alert(e.message); }
+            finally { setBusy(false); }
+          }}>Contacted</Button>
+          <Button size="sm" variant="outline" disabled={busy} onClick={async () => {
+            await setCandidateOpsStatus(c.id, 'looking_for_job', undefined, user?.id);
+            load();
+          }}>Looking for job</Button>
+          <Button size="sm" onClick={() => setSendOpen(!sendOpen)}>Send to workplace</Button>
+          <Button size="sm" variant="ghost" disabled={busy} onClick={async () => {
+            await setCandidateOpsStatus(c.id, 'active_job_seeker', undefined, user?.id);
+            setMsg('Active job seeker');
+            load();
+          }}>Active seeker</Button>
+        </div>
+
+        {sendOpen && (
+          <div className="border border-slate-100 rounded-xl p-3 space-y-2 bg-slate-50">
+            <input className="cj-input" placeholder="Workplace name *" value={wpName} onChange={(e) => setWpName(e.target.value)} />
+            <input className="cj-input" placeholder="Position *" value={wpPos} onChange={(e) => setWpPos(e.target.value || c.desired_position || '')} />
+            <input className="cj-input" type="number" placeholder="Salary NPR" value={wpSalary} onChange={(e) => setWpSalary(e.target.value)} />
+            <textarea className="cj-input min-h-[60px] py-2" placeholder="Notes" value={wpNotes} onChange={(e) => setWpNotes(e.target.value)} />
+            <Button size="sm" disabled={busy || !wpName.trim() || !wpPos.trim()} loading={busy} onClick={async () => {
+              setBusy(true);
+              try {
+                await sendToWorkplace({
+                  candidateId: c.id,
+                  workplaceName: wpName.trim(),
+                  positionTitle: wpPos.trim(),
+                  salaryAmount: wpSalary ? parseInt(wpSalary, 10) : undefined,
+                  notes: wpNotes || undefined,
+                  createdBy: user?.id,
+                });
+                setMsg('Sent to workplace — follow-up reminder set for tomorrow');
+                setSendOpen(false);
+                setWpName(''); setWpPos(''); setWpSalary(''); setWpNotes('');
+                load();
+              } catch (e: any) { alert(e.message || 'Failed — run SQL migration?'); }
+              finally { setBusy(false); }
+            }}>Confirm send</Button>
+          </div>
+        )}
+
+        {assignments.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <p className="text-xs font-semibold text-slate-500 uppercase">Workplace history</p>
+            {assignments.map((a) => (
+              <div key={a.id} className="border border-slate-100 rounded-xl p-3 text-sm">
+                <p className="font-medium">{a.position_title} @ {a.workplace_name}</p>
+                <p className="text-xs text-slate-500">
+                  Sent {a.sent_at} · Status {a.status}
+                  {a.trial_end ? ` · Trial ends ${a.trial_end}` : ''}
+                  {a.follow_up_date && !a.follow_up_done ? ` · Follow-up ${a.follow_up_date}` : ''}
+                </p>
+                {a.status === 'sent' && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <Button size="sm" variant="success" onClick={async () => {
+                      await confirmWorkplaceStatus(a.id, 'placed', { actorId: user?.id });
+                      load();
+                    }}>Placed</Button>
+                    <div className="flex items-center gap-1">
+                      <select className="cj-input h-9 w-24" value={trialDays} onChange={(e) => setTrialDays(e.target.value)}>
+                        <option value="3">3d</option>
+                        <option value="7">7d</option>
+                        <option value="15">15d</option>
+                        <option value="30">30d</option>
+                      </select>
+                      <Button size="sm" variant="outline" onClick={async () => {
+                        await confirmWorkplaceStatus(a.id, 'trial', { trialDays: parseInt(trialDays, 10), actorId: user?.id });
+                        load();
+                      }}>Start trial</Button>
+                    </div>
+                  </div>
+                )}
+                {a.status === 'trial' && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <Button size="sm" variant="success" onClick={async () => {
+                      await completeTrial(a.id, 'placed', { actorId: user?.id });
+                      load();
+                    }}>Trial → Placed</Button>
+                    <Button size="sm" variant="danger" onClick={async () => {
+                      await completeTrial(a.id, 'not_selected', { actorId: user?.id });
+                      load();
+                    }}>Not selected → Active seeker</Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activity.length > 0 && (
+          <div className="pt-2 border-t border-slate-100">
+            <p className="text-xs font-semibold text-slate-500 uppercase mb-2">Timeline</p>
+            <ul className="space-y-1.5">
+              {activity.slice(0, 12).map((ev) => (
+                <li key={ev.id} className="text-xs text-slate-600">
+                  <span className="text-slate-400">{new Date(ev.created_at).toLocaleString()}</span>
+                  {' · '}{ev.action}{ev.notes ? ` — ${ev.notes}` : ''}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       {/* Applications */}
