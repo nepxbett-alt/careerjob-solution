@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CareerJob Solution — Flyer</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #e8ecf1;
+      color: #0B1220;
+    }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .top-bar {
+      height: 8px;
+      background: linear-gradient(90deg, #0066FF, #00A3FF);
+    }
+    .hero {
+      padding: 28mm 18mm 16mm;
+      background: linear-gradient(180deg, #EEF4FF 0%, #ffffff 70%);
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0066FF;
+      background: #fff;
+      border: 1px solid #B3D1FF;
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: 36px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    h1 span { color: #0066FF; }
+    .sub {
+      font-size: 16px;
+      color: #3D4A5C;
+      line-height: 1.5;
+      max-width: 420px;
+      margin: 0 auto 22px;
+    }
+    .ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta {
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 12px;
+      text-decoration: none;
+    }
+    .cta-primary {
+      background: #0066FF;
+      color: #fff;
+    }
+    .cta-secondary {
+      background: #fff;
+      color: #0066FF;
+      border: 2px solid #0066FF;
+    }
+    .body {
+      padding: 8mm 18mm 14mm;
+      flex: 1;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .card {
+      border: 1px solid #E8ECF1;
+      border-radius: 16px;
+      padding: 16px 18px;
+      background: #F7F9FC;
+    }
+    .card h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0066FF;
+    }
+    .card ul {
+      list-style: none;
+      font-size: 13px;
+      color: #3D4A5C;
+      line-height: 1.55;
+    }
+    .card li::before {
+      content: "✓ ";
+      color: #0066FF;
+      font-weight: 700;
+    }
+    .process {
+      border: 1px solid #E8ECF1;
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 22px;
+    }
+    .process h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #3D4A5C;
+    }
+    .step {
+      flex: 1;
+      background: #EEF4FF;
+      border-radius: 10px;
+      padding: 10px 6px;
+    }
+    .step strong {
+      display: block;
+      color: #0066FF;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .contact {
+      text-align: center;
+      padding: 16px;
+      background: #0B1220;
+      color: #fff;
+      border-radius: 16px;
+    }
+    .contact h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .contact p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #CBD5E1;
+    }
+    .contact a {
+      color: #7EB6FF;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .footer {
+      text-align: center;
+      padding: 12px 18mm 16px;
+      font-size: 11px;
+      color: #98A2B3;
+    }
+    @media print {
+      body { background: #fff; }
+      .sheet { box-shadow: none; }
+      .no-print { display: none !important; }
+    }
+    .toolbar {
+      max-width: 210mm;
+      margin: 16px auto;
+      text-align: center;
+    }
+    .toolbar button {
+      background: #0066FF;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+    <p style="margin-top:8px;font-size:13px;color:#6B7789;">A4 flyer · CareerJob Solution · Pokhara</p>
+  </div>
+
+  <div class="sheet">
+    <div class="top-bar"></div>
+    <div class="hero">
+      <div class="badge">Pokhara recruitment · Human-led</div>
+      <h1>Find the right job.<br /><span>Find the right staff.</span></h1>
+      <p class="sub">
+        CareerJob Solution connects job seekers and workplaces in Pokhara.
+        Our team handles matching, workplace referral, follow-up, and placement.
+      </p>
+      <div class="ctas">
+        <span class="cta cta-primary">Find a job</span>
+        <span class="cta cta-secondary">Hire staff</span>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="grid">
+        <div class="card">
+          <h2>For job seekers</h2>
+          <ul>
+            <li>Submit your details or apply online</li>
+            <li>Build a professional CV</li>
+            <li>We contact and match you</li>
+            <li>Trial &amp; placement support</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>For businesses</h2>
+          <ul>
+            <li>Tell us the role you need</li>
+            <li>We screen candidates</li>
+            <li>We send people to your workplace</li>
+            <li>Follow-up until you hire</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="process">
+        <h2>How it works</h2>
+        <div class="steps">
+          <div class="step"><strong>1</strong>Submit</div>
+          <div class="step"><strong>2</strong>We call</div>
+          <div class="step"><strong>3</strong>Match</div>
+          <div class="step"><strong>4</strong>Workplace</div>
+          <div class="step"><strong>5</strong>Place</div>
+        </div>
+      </div>
+
+      <div class="contact">
+        <div class="brand">CAREERJOB SOLUTION</div>
+        <h2>Visit · Call · WhatsApp</h2>
+        <p>
+          Srijana Chowk, Pokhara, Nepal<br />
+          Phone: 9802858215 · 9802858216 · 9802858217<br />
+          WhatsApp: 9802858215<br />
+          <a href="https://careerjobsolution.com.np">careerjobsolution.com.np</a><br />
+          solutioncareerjob32@gmail.com
+        </p>
+      </div>
+    </div>
+
+    <div class="footer">
+      Not a freelance marketplace — a local recruitment service for Pokhara.
+    </div>
+  </div>
+</body>
+</html>
