@@ -2,13 +2,25 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Phone, FileText, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { getSignedCVUrl } from '../../services/candidateService';
-import { setSeekerStatus } from '../../services/candidateService';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  getSignedCVUrl,
+  setSeekerStatus,
+  saveCandidateCvFields,
+  uploadCandidateFile,
+} from '../../services/candidateService';
 import { applyToJob, getAllApplications, updateApplicationStatus, rejectApplication } from '../../services/applicationService';
 import { searchJobs, type Job } from '../../services/jobService';
+import {
+  markCandidateContacted,
+  sendToWorkplace,
+  confirmWorkplaceStatus,
+  completeTrial,
+  getActivity,
+  setCandidateOpsStatus,
+} from '../../services/opsService';
 import { Button } from '../../components/ui/Button';
 import { CvBuilder } from '../../components/CvBuilder';
-import { saveCandidateCvFields, uploadCandidateFile } from '../../services/candidateService';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 
 interface Candidate {
@@ -27,6 +39,7 @@ interface Candidate {
   seeker_status: string | null;
   profile_completion: number;
   registration_source: string | null;
+  ops_status?: string | null;
   headline?: string | null;
   bio?: string | null;
   experience_notes?: string | null;

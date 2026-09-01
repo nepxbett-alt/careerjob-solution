@@ -34,7 +34,6 @@ const STYLES: Record<string, string> = {
   sent_to_workplace: 'bg-orange-50 text-orange-900 ring-1 ring-orange-100',
   trial: 'bg-amber-50 text-amber-900 ring-1 ring-amber-100',
   active_job_seeker: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100',
-  inactive: 'bg-slate-50 text-slate-500 ring-1 ring-slate-100',
 };
 
 const LABELS: Record<string, string> = {
@@ -71,7 +70,6 @@ const LABELS: Record<string, string> = {
   sent_to_workplace: 'Sent to workplace',
   trial: 'Trial',
   active_job_seeker: 'Active seeker',
-  inactive: 'Inactive',
 };
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
